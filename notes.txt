@@ -1,0 +1,18 @@
+https://www.270towin.com/historical-presidential-elections/timeline/
+
+
+sources
+https://www.archives.gov/electoral-college/2024
+
+https://www.presidency.ucsb.edu/statistics/elections/1848
+
+
+
+STACK
+
+scraping - python bs4
+db - postgres
+backend - express
+front - react, tailwind, tanstack router, swr?, shadcn
+
+
