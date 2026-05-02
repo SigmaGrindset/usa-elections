@@ -47,24 +47,25 @@ class Scraper:
         self.scrape_general_info_table(tables[0])
 
     def scrape_general_info_table(self, table):
-        president_name, president_party = self.get_main_candidate_info(
-            table, "President"
-        )
-        op_name, op_party = self.get_main_candidate_info(table, "Main Opponent")
-        # vp = self.get_vice_candidate_info(table, "Vice President")
-        # op_vp = self.get_vice_candidate_info(table, "V.P. Opponent")
-        # winner_ev, main_op_ev, total_majority = self.get_electoral_vote(table)
+        president_name, president_party = self.get_president_info(table)
+        ops = self.get_opponents_info(table)
+        winner_ev, total_majority = self.get_electoral_vote(table)
+        print(president_name, president_party)
+        print(ops)
+        print(winner_ev, total_majority)
 
     def get_info_row(self, table, th_name):
-        row = table.find("th", string=re.compile(th_name)).parent
-        return row
+        row = table.find("th", string=re.compile(th_name))
+        if not row:
+            return None
+        return row.parent
 
     def get_electoral_vote(self, table):
         row = self.get_info_row(table, "Electoral Vote")
         winner_ev = int(self.get_specific_count(row, "Winner"))
-        main_op_ev = int(self.get_specific_count(row, "Main Opponent"))
+        # main_op_ev = int(self.get_specific_count(row, "Main Opponent"))
         total_majority = self.get_specific_count(row, "Total/Majority")
-        return (winner_ev, main_op_ev, total_majority)
+        return (winner_ev, total_majority)
 
     def get_specific_count(self, row, td_name):
         td = next((t for t in row.find_all("td") if td_name in t.get_text()), None)
@@ -81,45 +82,35 @@ class Scraper:
             .replace("*", "")
         )
         votes_part = votes_part.replace("\xa0", " ").strip()
-        if "Others" not in votes_part:
-            return votes_part
-        print(td)
-        print(votes_part)
-        split = votes_part.split(" (Others ")
-        print(split)
-        return votes
+        return votes_part
 
-    def get_main_candidate_info(self, table, th_name):
-        row = self.get_info_row(table, th_name)
-        td = row.find("td")
-        text = td.get_text()
-        name, other = text.split(" [")
-        name = name.strip()
-        other = other.replace("]", "").replace(")", "").strip()
-        print(name, other)
-        return (name, other)
+    def get_president_info(self, table):
+        row = self.get_info_row(table, "President")
+        candidates = self.get_main_candidate_info(table, row)
+        return candidates[0]
 
-    def get_vice_candidate_info(self, table, th_name):
-        row = self.get_info_row(table, th_name)
-        td = row.find("td")
-        sup = td.find("sup")
-        if sup:
-            sup.decompose()
-        text = td.get_text()
+    def get_opponents_info(self, table):
+        row = self.get_info_row(table, "Main Opponent")
+        if not row:
+            row = self.get_info_row(table, "Opponents")
+        opponents = self.get_main_candidate_info(table, row)
+        return opponents
+
+    def get_main_candidate_info(self, table, row):
         candidates = []
-        for text in text.split("),"):
+        td = row.find("td")
+        text = td.get_text()
+        for text in text.split("; "):
             name, other = "", ""
             if " [" in text:
                 name, other = text.split(" [")
             elif " (" in text:
                 name, other = text.split(" (")
+                other = ""
             else:
-                *name, other = text.split()
-                name = " ".join(name)
-
+                raise Exception("nema separatora")
             name = name.strip()
-            other = other.replace("]", "").replace(")", "").replace("*", "").strip()
-            print(name, other)
+            other = other.replace("]", "").replace(")", "").strip()
             candidates.append((name, other))
         return candidates
 
