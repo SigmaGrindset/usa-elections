@@ -244,12 +244,75 @@ def normalize_party(raw):
 parties = set()
 
 
+def format_data(general_info, votes, year):
+    results = dict()
+    results["year"] = year
+    split = (
+        general_info["total_majority"]
+        .replace("*", "")
+        .replace("(", "")
+        .replace(")", "")
+        .split("/")
+    )
+    results["total_ev"] = int(split[0].split(" ")[0])
+    results["majority_ev"] = int(split[1])
+    results["state_results"] = []
+    candidates = votes["candidates"]
+    totals = votes["totals"]
+    if year != 1789:
+        totals = totals[1:]
+    results["candidates"] = []
+    winner_total = max(totals)
+
+    for i in range(0, len(candidates)):
+        candidate_obj = {
+            "name": candidates[i],
+            "party": "Unknown",
+            "role": "vice president",
+            "total_ev": totals[i],
+            "is_winner": False,
+        }
+        if general_info["president_name"] == candidate_obj["name"]:
+            candidate_obj["party"] = general_info["president_party"]
+        else:
+            for name, party in general_info["opponents"]:
+                if name == candidate_obj["name"]:
+                    if party:
+                        candidate_obj["party"] = party
+
+        if year < 1800:
+            candidate_obj["role"] = "president"
+        elif general_info["president_name"] == candidate_obj["name"]:
+            candidate_obj["role"] = "president"
+        elif i < len(candidates) / 2:
+            candidate_obj["role"] = "president"
+
+        if totals[i] == winner_total:
+            candidate_obj["is_winner"] = True
+        results["candidates"].append(candidate_obj)
+
+    for vote in votes["votes"]:
+        state_obj = dict()
+        state_obj["state_name"] = vote["state"]
+        state_obj["total_ev"] = vote["total"]
+        state_obj["candidate_ev"] = []
+        for i in range(0, len(candidates)):
+            candidate_obj = {"name": candidates[i], "ev_count": vote["votes"][i]}
+            state_obj["candidate_ev"].append(candidate_obj)
+
+        results["state_results"].append(state_obj)
+    return results
+
+
 def main():
     for year in reversed(YEARS):
         print(f"\n--------Scraping: {year}-----------")
         loader = Loader(year)
         scraper = Scraper(year, loader)
         general_info, votes = scraper.scrape()
+        data = format_data(general_info, votes, year)
+        print(data)
+        # print(general_info, votes, sep="\n")
 
 
 main()
