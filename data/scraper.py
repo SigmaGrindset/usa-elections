@@ -44,15 +44,44 @@ class Scraper:
 
     def scrape(self):
         tables = self.bs.find_all("table")[:2]
-        self.scrape_general_info_table(tables[0])
+        general_info = self.scrape_general_info_table(tables[0])
+        votes = self.scrape_votes_table(tables[1])
+        return (general_info, votes)
 
     def scrape_general_info_table(self, table):
         president_name, president_party = self.get_president_info(table)
         ops = self.get_opponents_info(table)
         winner_ev, total_majority = self.get_electoral_vote(table)
-        print(president_name, president_party)
-        print(ops)
-        print(winner_ev, total_majority)
+        result = {
+            "president_name": president_name,
+            "president_party": president_party,
+            "opponents": ops,
+            "winner_ev": winner_ev,
+            "total_majority": total_majority,
+        }
+        return result
+
+    def scrape_votes_table(self, table):
+        rows = table.find_all("tr")
+        totals_index = self.get_totals_index(rows)
+        candidates_row = rows[1]
+        vote_rows = rows[2:totals_index]
+        totals_row = rows[totals_index]
+        candidates = self.get_candidates(candidates_row)
+        totals = self.get_totals(totals_row)
+        votes = self.get_votes(vote_rows)
+        result = {
+            "candidates": candidates,
+            "totals": totals,
+            "votes": votes,
+        }
+        return result
+
+    def get_totals_index(self, rows):
+        for i in range(0, len(rows)):
+            row = rows[i]
+            if row.find(string=re.compile("Total")):
+                return i
 
     def get_info_row(self, table, th_name):
         row = table.find("th", string=re.compile(th_name))
@@ -111,19 +140,89 @@ class Scraper:
                 raise Exception("nema separatora")
             name = name.strip()
             other = other.replace("]", "").replace(")", "").strip()
+            other = normalize_party(other)
+            parties.add(other)
             candidates.append((name, other))
         return candidates
 
-    def scrape_data_table(self, table):
-        pass
+    def get_votes(self, rows):
+        votes = []
+        for row in rows:
+            tds = row.find_all("td")
+            if len(tds) == 0:
+                continue
+            state_name = tds[0].get_text()
+            text = tds[1].get_text()
+            total_state_votes = 0 if "-" in text else int(text)
+            state_votes = []
+            for td in tds[2:]:
+                text = td.get_text().strip().replace("(", "").replace(")", "")
+                num_votes = 0 if "-" in text else int(text)
+                state_votes.append(num_votes)
+            votes.append(
+                {
+                    "state": state_name,
+                    "total": total_state_votes,
+                    "votes": state_votes,
+                }
+            )
+        return votes
+
+    def get_totals(self, row):
+        tds = row.find_all("td")
+        totals = []
+        for td in tds:
+            if "Total" in td.get_text():
+                continue
+            votes = td.get_text().strip().split("(")[0]
+            votes = 0 if "-" in votes else int(votes)
+            totals.append(votes)
+        return totals
+
+    def get_candidates(self, row):
+        tds = row.find_all("td")
+        candidates = []
+        for td in tds:
+            text = td.get_text()
+            name = text.split("of")[0].strip()
+            name = name[0 : len(name) - 1]
+            candidates.append(name)
+        return candidates
+
+
+PARTY_NORMALIZATION = {
+    "R": "Republican",
+    "D": "Democratic",
+    "F": "Federalist",
+    "Federalist": "Federalist",
+    "Federalist/Independent D-R": "Federalist/Independent Democratic-Republican",
+    "D-R": "Democratic-Republican",
+    "Democratic-Republican": "Democratic-Republican",
+    "Independent D-R": "Democratic-Republican",
+    "National Republican": "National Republican",
+    "Whig": "Whig",
+    "D-P": "Democratic-Populist",
+    "P": "Progressive",
+    "Independent": "Independent",
+    "": "",
+}
+
+
+def normalize_party(raw):
+    return PARTY_NORMALIZATION.get(raw, raw)
+
+
+parties = set()
 
 
 def main():
     for year in reversed(YEARS):
+        year = 1789
         print(f"\n--------Scraping: {year}-----------")
         loader = Loader(year)
         scraper = Scraper(year, loader)
-        scraper.scrape()
+        general_info, votes = scraper.scrape()
+        break
 
 
 main()

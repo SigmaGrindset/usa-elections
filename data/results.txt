@@ -1,0 +1,300 @@
+--------Scraping: 1789-----------
+George Washington F
+[('John Adams', 'F')]
+69 69/35
+
+--------Scraping: 1792-----------
+George Washington Independent
+[('John Adams', 'Federalist')]
+132 132/67
+
+--------Scraping: 1796-----------
+John Adams Federalist
+[('Thomas Jefferson', 'Democratic-Republican')]
+71 138/70
+
+--------Scraping: 1800-----------
+Thomas Jefferson Democratic-Republican
+[('Aaron Burr', ''), ('John Adams', ''), ('Charles C. Pinckney', ''), ('John Jay', '')]
+73 138/70
+
+--------Scraping: 1804-----------
+Thomas Jefferson Democratic-Republican
+[('Charles C. Pinckney', 'Federalist')]
+162 176/89
+
+--------Scraping: 1808-----------
+James Madison Democratic-Republican
+[('Charles C. Pinckney', 'Federalist')]
+122 176 (175)/89
+
+--------Scraping: 1812-----------
+James Madison Democratic-Republican
+[('De Witt Clinton', 'Federalist/Independent D-R')]
+128 217/109
+
+--------Scraping: 1816-----------
+James Monroe Democratic-Republican
+[('Rufus King', 'Federalist')]
+183 221 (217)/111
+
+--------Scraping: 1820-----------
+James Monroe Democratic-Republican
+[('John Quincy Adams', 'Independent D-R')]
+231 235/118
+
+--------Scraping: 1824-----------
+Andrew Jackson Democratic-Republican
+[('John Quincy Adams', 'D-R')]
+99 261/131
+
+--------Scraping: 1828-----------
+Andrew Jackson Democratic-Republican
+[('John Quincy Adams', 'National Republican')]
+178 261/131
+
+--------Scraping: 1832-----------
+Andrew Jackson D
+[('Henry Clay', 'National Republican')]
+219 286/144
+
+--------Scraping: 1836-----------
+Martin Van Buren D
+[('William H. Harrison', 'Whig')]
+170 294/148
+
+--------Scraping: 1840-----------
+William H. Harrison Whig
+[('Martin Van Buren', 'D')]
+234 294/148
+
+--------Scraping: 1844-----------
+James K. Polk D
+[('Henry Clay', 'Whig')]
+170 275/138
+
+--------Scraping: 1848-----------
+Zachary Taylor Whig
+[('Lewis Cass', 'D')]
+163 290/146
+
+--------Scraping: 1852-----------
+Franklin Pierce D
+[('Winfield Scott', 'Whig')]
+254 296/149
+
+--------Scraping: 1856-----------
+James Buchanan D
+[('John C. Frémont', 'R')]
+174 296/149
+
+--------Scraping: 1860-----------
+Abraham Lincoln R
+[('Stephen A. Douglas', 'D')]
+180 303/152
+
+--------Scraping: 1864-----------
+Abraham Lincoln R
+[('George B. McClellan', 'D')]
+212 233/117
+
+--------Scraping: 1868-----------
+Ulysses S. Grant R
+[('Horatio Seymour', 'D')]
+214 294/148
+
+--------Scraping: 1872-----------
+Ulysses S. Grant R
+[('Horace Greeley', 'D')]
+286 352/177
+
+--------Scraping: 1876-----------
+Rutherford B. Hayes R
+[('Samuel J. Tilden', 'D')]
+185 369/185
+
+--------Scraping: 1880-----------
+James A. Garfield R
+[('Winfield S. Hancock', 'D')]
+214 369/185
+
+--------Scraping: 1884-----------
+Grover Cleveland D
+[('James G. Blaine', 'R')]
+219 401/201
+
+--------Scraping: 1888-----------
+Benjamin Harrison R
+[('Grover Cleveland', 'D')]
+233 401/201
+
+--------Scraping: 1892-----------
+Grover Cleveland D
+[('Benjamin Harrison', 'R')]
+277 444/223
+
+--------Scraping: 1896-----------
+William McKinley R
+[('William J. Bryan', 'D-P')]
+271 447/224
+
+--------Scraping: 1900-----------
+William McKinley R
+[('William J. Bryan', 'D-P')]
+292 447/224
+
+--------Scraping: 1904-----------
+Theodore Roosevelt R
+[('Alton B. Parker', 'D')]
+336 476/239
+
+--------Scraping: 1908-----------
+William H. Taft R
+[('William J. Bryan', 'D')]
+321 483/242
+
+--------Scraping: 1912-----------
+Woodrow Wilson D
+[('Theodore Roosevelt', 'P')]
+435 531/266
+
+--------Scraping: 1916-----------
+Woodrow Wilson D
+[('Charles E. Hughes', 'R')]
+277 531/266
+
+--------Scraping: 1920-----------
+Warren G. Harding R
+[('James M. Cox', 'D')]
+404 531/266
+
+--------Scraping: 1924-----------
+Calvin Coolidge R
+[('John W. Davis', 'D')]
+382 531/266
+
+--------Scraping: 1928-----------
+Herbert C. Hoover R
+[('Alfred E. Smith', 'D')]
+444 531/266
+
+--------Scraping: 1932-----------
+Franklin D. Roosevelt D
+[('Herbert C. Hoover', 'R')]
+472 531/266
+
+--------Scraping: 1936-----------
+Franklin D. Roosevelt D
+[('Alfred M. Landon', 'R')]
+523 531/266
+
+--------Scraping: 1940-----------
+Franklin D. Roosevelt D
+[('Wendell L. Willkie', 'R')]
+449 531/266
+
+--------Scraping: 1944-----------
+Franklin D. Roosevelt D
+[('Thomas E. Dewey', 'R')]
+432 531/266
+
+--------Scraping: 1948-----------
+Harry S. Truman D
+[('Thomas E. Dewey', 'R')]
+303 531/266
+
+--------Scraping: 1952-----------
+Dwight D. Eisenhower R
+[('Adlai Stevenson', 'D')]
+442 531/266
+
+--------Scraping: 1956-----------
+Dwight D. Eisenhower R
+[('Adlai Stevenson', 'D')]
+457 531/266
+
+--------Scraping: 1960-----------
+John F. Kennedy D
+[('Richard M. Nixon', 'R')]
+303 537/269
+
+--------Scraping: 1964-----------
+Lyndon B. Johnson D
+[('Barry M. Goldwater', 'R')]
+486 538/270
+
+--------Scraping: 1968-----------
+Richard M. Nixon R
+[('Hubert H. Humphrey', 'D')]
+301 538/270
+
+--------Scraping: 1972-----------
+Richard M. Nixon R
+[('George S. McGovern', 'D')]
+520 538/270
+
+--------Scraping: 1976-----------
+Jimmy Carter D
+[('Gerald R. Ford', 'R')]
+297 538/270
+
+--------Scraping: 1980-----------
+Ronald Reagan R
+[('Jimmy Carter', 'D')]
+489 538/270
+
+--------Scraping: 1984-----------
+Ronald Reagan R
+[('Walter F. Mondale', 'D')]
+525 538/270
+
+--------Scraping: 1988-----------
+George Bush R
+[('Michael S. Dukakis', 'D')]
+426 538/270
+
+--------Scraping: 1992-----------
+William J. Clinton D
+[('George Bush', 'R')]
+370 538/270
+
+--------Scraping: 1996-----------
+William J. Clinton D
+[('Bob Dole', 'R')]
+379 538/270
+
+--------Scraping: 2000-----------
+George W. Bush R
+[('Albert Gore, Jr.', 'D')]
+271 538/270
+
+--------Scraping: 2004-----------
+George W. Bush R
+[('John F. Kerry', 'D')]
+286 538/270
+
+--------Scraping: 2008-----------
+Barack Obama D
+[('John McCain', 'R')]
+365 538/270
+
+--------Scraping: 2012-----------
+Barack Obama D
+[('Mitt Romney', 'R')]
+332 538/270
+
+--------Scraping: 2016-----------
+Donald J. Trump R
+[('Hillary Clinton', 'D')]
+304 538/270
+
+--------Scraping: 2020-----------
+Joseph R. Biden Jr. D
+[('Donald J. Trump', 'R')]
+306 538/270
+
+--------Scraping: 2024-----------
+Donald J. Trump R
+[('Kamala D. Harris', 'D')]
+312 538/270
+{'', 'Whig', 'D-R', 'Independent D-R', 'Democratic-Republican', 'D', 'R', 'F', 'P', 'Federalist/Independent D-R', 'National Republican', 'D-P', 'Federalist', 'Independent'}
