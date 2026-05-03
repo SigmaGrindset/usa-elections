@@ -194,7 +194,9 @@ class Scraper:
             tds = row.find_all("td")
             if len(tds) == 0:
                 continue
-            state_name = tds[0].get_text()
+            state_name = tds[0].get_text().strip()
+            state_name = state_name.replace("\xa0", "")
+            state_name = re.sub(r"[\d\*]+$", "", state_name)
             text = tds[1].get_text()
             total_state_votes = 0 if "-" in text else int(text)
             state_votes = []
@@ -268,7 +270,7 @@ def format_data(general_info, votes, year):
         candidate_obj = {
             "name": candidates[i],
             "party": "Unknown",
-            "role": "vice president",
+            "role": "vice_president",
             "total_ev": totals[i],
             "is_winner": False,
         }
@@ -311,8 +313,8 @@ def main():
         scraper = Scraper(year, loader)
         general_info, votes = scraper.scrape()
         data = format_data(general_info, votes, year)
-        print(data)
-        # print(general_info, votes, sep="\n")
+        response = requests.post("http://localhost:3000/api/elections", json=data)
+        print(response)
 
 
 main()
