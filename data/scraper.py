@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-from constants import YEARS, BASE_URL
+from constants import YEARS, BASE_URL, PARTY_NORMALIZATION, STATES_NORMALIZATION
 import requests
 from urllib.request import Request, urlopen
 import re
@@ -61,7 +61,50 @@ class Scraper:
         }
         return result
 
+    def scrape_1789_table(self, table):
+        rows = table.find_all("tr")
+        candidates = []
+        totals = []
+        states = rows[0].find_all("th")
+        states = states[1 : len(states) - 1]
+        states = [normalize_state(state.get_text().strip()) for state in states]
+        votes_dict = dict()
+        for state in states:
+            votes_dict[state] = []
+
+        for row in rows[1 : len(rows) - 1]:
+            tds = row.find_all("td")
+            for i in range(0, len(tds[1 : len(tds) - 1])):
+                td = tds[1 + i]
+                state_name = states[i]
+                text = td.get_text()
+                votes = 0 if "-" in text else int(text)
+                votes_dict[state_name].append(votes)
+
+            candidate = tds[0].get_text().split(", Esq")[0].strip()
+            total = int(tds[-1].get_text().strip())
+            totals.append(total)
+            candidates.append(candidate)
+        total_evs = rows[-1].find_all("td")[0:-1]
+        total_evs = [int(td.get_text().strip()) for td in total_evs]
+        votes = []
+
+        for i in range(0, len(states)):
+            state = states[i]
+            total = total_evs[i]
+            votes_arr = votes_dict[state]
+            obj = {"state": state, "total": total, "votes": votes_arr}
+            votes.append(obj)
+        result = {
+            "candidates": candidates,
+            "totals": totals,
+            "votes": votes,
+        }
+        return result
+
     def scrape_votes_table(self, table):
+        if self.year == 1789:
+            return self.scrape_1789_table(table)
         rows = table.find_all("tr")
         totals_index = self.get_totals_index(rows)
         candidates_row = rows[1]
@@ -190,22 +233,8 @@ class Scraper:
         return candidates
 
 
-PARTY_NORMALIZATION = {
-    "R": "Republican",
-    "D": "Democratic",
-    "F": "Federalist",
-    "Federalist": "Federalist",
-    "Federalist/Independent D-R": "Federalist/Independent Democratic-Republican",
-    "D-R": "Democratic-Republican",
-    "Democratic-Republican": "Democratic-Republican",
-    "Independent D-R": "Democratic-Republican",
-    "National Republican": "National Republican",
-    "Whig": "Whig",
-    "D-P": "Democratic-Populist",
-    "P": "Progressive",
-    "Independent": "Independent",
-    "": "",
-}
+def normalize_state(abbr):
+    return STATES_NORMALIZATION.get(abbr, abbr)
 
 
 def normalize_party(raw):
@@ -217,12 +246,10 @@ parties = set()
 
 def main():
     for year in reversed(YEARS):
-        year = 1789
         print(f"\n--------Scraping: {year}-----------")
         loader = Loader(year)
         scraper = Scraper(year, loader)
         general_info, votes = scraper.scrape()
-        break
 
 
 main()

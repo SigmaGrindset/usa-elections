@@ -1,5 +1,35 @@
 BASE_URL = "https://www.archives.gov/electoral-college/"
 
+PARTY_NORMALIZATION = {
+    "R": "Republican",
+    "D": "Democratic",
+    "F": "Federalist",
+    "Federalist": "Federalist",
+    "Federalist/Independent D-R": "Federalist/Independent Democratic-Republican",
+    "D-R": "Democratic-Republican",
+    "Democratic-Republican": "Democratic-Republican",
+    "Independent D-R": "Democratic-Republican",
+    "National Republican": "National Republican",
+    "Whig": "Whig",
+    "D-P": "Democratic-Populist",
+    "P": "Progressive",
+    "Independent": "Independent",
+    "": "",
+}
+
+STATES_NORMALIZATION = {
+    "CT": "Connecticut",
+    "DE": "Delaware",
+    "GA": "Georgia",
+    "MD": "Maryland",
+    "MA": "Massachusetts",
+    "NH": "New Hampshire",
+    "NJ": "New Jersey",
+    "PA": "Pennsylvania",
+    "SC": "South Carolina",
+    "VA": "Virginia",
+}
+
 YEARS = [
     1789,
     1792,
