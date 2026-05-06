@@ -13,9 +13,45 @@ const app = express()
 
 app.use(express.json())
 app.use(morgan("dev"));
+
+app.get("/api/elections/:year", async (req, res) => {
+  const year = parseInt(req.params.year);
+
+  try {
+    const election = await prisma.election.findUnique({
+      where: { year },
+      include: {
+        election_candidates: {
+          include: {
+            candidate: true,
+          }
+        },
+        state_results: {
+          include: {
+            state_result_candidates: {
+              include: {
+                election_candidate: true,
+              }
+            }
+          }
+        }
+      }
+    });
+
+    if (!election) {
+      return res.status(404).json({ success: false, error: `Election ${year} not found` });
+    }
+
+    console.log(Object.keys(election))
+    res.json({ success: true, data: election });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: (error as Error).message });
+  }
+});
+
 app.post("/api/elections", async (req, res) => {
   const { year, total_ev, majority_ev, candidates, state_results } = req.body;
-
   try {
     await prisma.$transaction(async (tx) => {
       await tx.election.create({
@@ -33,7 +69,6 @@ app.post("/api/elections", async (req, res) => {
           dbCandidate = await tx.candidate.create({
             data: {
               name: candidate.name,
-              party: candidate.party,
             }
           });
         }
@@ -45,6 +80,7 @@ app.post("/api/elections", async (req, res) => {
             role: candidate.role,
             total_ev: candidate.total_ev,
             is_winner: candidate.is_winner,
+            party: candidate.party
           }
         });
 

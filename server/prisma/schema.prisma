@@ -19,7 +19,6 @@ model Election {
 model Candidate {
   id    Int    @id @default(autoincrement())
   name  String
-  party String
 
   election_candidates ElectionCandidate[]
 }
@@ -31,7 +30,7 @@ model ElectionCandidate {
   role          String
   total_ev      Int
   is_winner     Boolean
-
+  party         String
   election              Election               @relation(fields: [election_year], references: [year])
   candidate             Candidate              @relation(fields: [candidate_id], references: [id])
   state_result_candidates StateResultCandidate[]

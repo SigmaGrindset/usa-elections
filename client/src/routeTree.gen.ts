@@ -9,68 +9,109 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as ElectionYearRouteImport } from './routes/election.$year'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as AppCompareRouteImport } from './routes/_app/compare'
+import { Route as AppElectionYearRouteImport } from './routes/_app/election.$year'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ElectionYearRoute = ElectionYearRouteImport.update({
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCompareRoute = AppCompareRouteImport.update({
+  id: '/compare',
+  path: '/compare',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppElectionYearRoute = AppElectionYearRouteImport.update({
   id: '/election/$year',
   path: '/election/$year',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AppRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/election/$year': typeof ElectionYearRoute
+  '/': typeof AppIndexRoute
+  '/compare': typeof AppCompareRoute
+  '/election/$year': typeof AppElectionYearRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/election/$year': typeof ElectionYearRoute
+  '/compare': typeof AppCompareRoute
+  '/': typeof AppIndexRoute
+  '/election/$year': typeof AppElectionYearRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/election/$year': typeof ElectionYearRoute
+  '/_app': typeof AppRouteWithChildren
+  '/_app/compare': typeof AppCompareRoute
+  '/_app/': typeof AppIndexRoute
+  '/_app/election/$year': typeof AppElectionYearRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/election/$year'
+  fullPaths: '/' | '/compare' | '/election/$year'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/election/$year'
-  id: '__root__' | '/' | '/election/$year'
+  to: '/compare' | '/' | '/election/$year'
+  id: '__root__' | '/_app' | '/_app/compare' | '/_app/' | '/_app/election/$year'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  ElectionYearRoute: typeof ElectionYearRoute
+  AppRoute: typeof AppRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
+    '/_app': {
+      id: '/_app'
+      path: ''
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+      preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/election/$year': {
-      id: '/election/$year'
+    '/_app/': {
+      id: '/_app/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/compare': {
+      id: '/_app/compare'
+      path: '/compare'
+      fullPath: '/compare'
+      preLoaderRoute: typeof AppCompareRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/election/$year': {
+      id: '/_app/election/$year'
       path: '/election/$year'
       fullPath: '/election/$year'
-      preLoaderRoute: typeof ElectionYearRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AppElectionYearRouteImport
+      parentRoute: typeof AppRoute
     }
   }
 }
 
+interface AppRouteChildren {
+  AppCompareRoute: typeof AppCompareRoute
+  AppIndexRoute: typeof AppIndexRoute
+  AppElectionYearRoute: typeof AppElectionYearRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppCompareRoute: AppCompareRoute,
+  AppIndexRoute: AppIndexRoute,
+  AppElectionYearRoute: AppElectionYearRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  ElectionYearRoute: ElectionYearRoute,
+  AppRoute: AppRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
