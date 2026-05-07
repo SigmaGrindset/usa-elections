@@ -246,6 +246,16 @@ def normalize_party(raw):
 parties = set()
 
 
+def names_match(name1: str, name2: str) -> bool:
+    parts1 = name1.lower().replace(".", "").split()
+    parts2 = name2.lower().replace(".", "").split()
+    if parts1[-1] != parts2[-1]:
+        return False
+    first1 = parts1[0]
+    first2 = parts2[0]
+    return first1.startswith(first2) or first2.startswith(first1)
+
+
 def format_data(general_info, votes, year):
     results = dict()
     results["year"] = year
@@ -274,11 +284,11 @@ def format_data(general_info, votes, year):
             "total_ev": totals[i],
             "is_winner": False,
         }
-        if general_info["president_name"] == candidate_obj["name"]:
+        if names_match(general_info["president_name"], candidate_obj["name"]):
             candidate_obj["party"] = general_info["president_party"]
         else:
             for name, party in general_info["opponents"]:
-                if name == candidate_obj["name"]:
+                if names_match(name, candidate_obj["name"]):
                     if party:
                         candidate_obj["party"] = party
 
@@ -307,14 +317,16 @@ def format_data(general_info, votes, year):
 
 
 def main():
-    for year in reversed(YEARS):
+    my_years = [2016]
+    for year in reversed(my_years):
         print(f"\n--------Scraping: {year}-----------")
         loader = Loader(year)
         scraper = Scraper(year, loader)
         general_info, votes = scraper.scrape()
         data = format_data(general_info, votes, year)
-        response = requests.post("http://localhost:3000/api/elections", json=data)
-        print(response)
+        print(data["candidates"])
+        # response = requests.post("http://localhost:3000/api/elections", json=data)
+        # print(response)
 
 
 main()

@@ -21,6 +21,7 @@ body {
   --color-text: #e8e6e0;
   --color-accent: #c0392b;
   --color-accent-hover: #a93226;
+  --color-muted: rgb(255 255 255 / 0.55);
 }
 
 @layer utilities {

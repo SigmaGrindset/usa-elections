@@ -70,7 +70,7 @@ export const PARTY_COLORS = {
   "Federalist": "#6A0DAD",
   "Federalist/Independent Democratic-Republican": "#7B3F00",
   "National Republican": "#B8860B",
-  "Democratic-Populist": "#C0392B",
+  "Democratic-Populist": "#8B0000",
   "Progressive": "#FF6B00",
   "Independent": "#708090",
   "Unknown": "#AAAAAA",

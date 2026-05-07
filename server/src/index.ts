@@ -41,8 +41,7 @@ app.get("/api/elections/:year", async (req, res) => {
     if (!election) {
       return res.status(404).json({ success: false, error: `Election ${year} not found` });
     }
-
-    console.log(Object.keys(election))
+    console.log(election)
     res.json({ success: true, data: election });
   } catch (error) {
     console.error(error);

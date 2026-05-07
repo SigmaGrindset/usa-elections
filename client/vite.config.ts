@@ -5,9 +5,20 @@ import { tanstackRouter } from '@tanstack/router-plugin/vite'
 
 import viteReact from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import * as dotenv from 'dotenv'
+
+dotenv.config()
+
 
 const config = defineConfig({
   resolve: { tsconfigPaths: true },
+  server: {
+    proxy: {
+      '/api': process.env.VITE_API_URL ?? 'http://localhost:3000'
+
+
+    }
+  },
   plugins: [
     devtools(),
     tailwindcss(),
