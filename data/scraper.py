@@ -229,8 +229,13 @@ class Scraper:
         candidates = []
         for td in tds:
             text = td.get_text()
-            name = text.split("of")[0].strip()
-            name = name[0 : len(name) - 1]
+            split = text.split("of")
+            name = split[0].strip()
+            if len(split) > 1:
+                name = name[0 : len(name) - 1]
+            else:
+                name = name[0 : len(name)]
+
             candidates.append(name)
         return candidates
 
@@ -303,6 +308,19 @@ def format_data(general_info, votes, year):
             candidate_obj["is_winner"] = True
         results["candidates"].append(candidate_obj)
 
+    others = [c for c in results["candidates"] if c["name"] == "Other"]
+    non_others = [c for c in results["candidates"] if c["name"] != "Other"]
+
+    if others:
+        merged_other = {
+            "name": "Other",
+            "party": "Unknown",
+            "role": "president",
+            "total_ev": sum(o["total_ev"] for o in others),
+            "is_winner": False,
+        }
+
+        results["candidates"] = non_others + [merged_other]
     for vote in votes["votes"]:
         state_obj = dict()
         state_obj["state_name"] = vote["state"]
@@ -313,11 +331,21 @@ def format_data(general_info, votes, year):
             state_obj["candidate_ev"].append(candidate_obj)
 
         results["state_results"].append(state_obj)
+
+    for state in results["state_results"]:
+        other_ev = sum(
+            c["ev_count"] for c in state["candidate_ev"] if c["name"] == "Other"
+        )
+        state["candidate_ev"] = [
+            c for c in state["candidate_ev"] if c["name"] != "Other"
+        ]
+        if other_ev > 0 or others:
+            state["candidate_ev"].append({"name": "Other", "ev_count": other_ev})
     return results
 
 
 def main():
-    my_years = [2016]
+    my_years = [2004]
     for year in reversed(my_years):
         print(f"\n--------Scraping: {year}-----------")
         loader = Loader(year)
