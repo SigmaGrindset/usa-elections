@@ -231,14 +231,7 @@ class Scraper:
             text = td.get_text()
             split = text.split("of")
             name = split[0].strip()
-            if len(split) > 1:
-                if "," in name:
-                    name = name[0 : len(name) - 1]
-                else:
-                    name = name[0 : len(name)]
-            else:
-                name = name[0 : len(name)]
-
+            name = name.replace(",", "").replace("*", "")
             candidates.append(name)
         return candidates
 
