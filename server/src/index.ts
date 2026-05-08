@@ -126,7 +126,7 @@ app.post("/api/elections", async (req, res) => {
           }
         });
 
-        electionCandidateMap[candidate.name] = electionCandidate.id;
+        electionCandidateMap[`${candidate.name}_${candidate.role}`] = electionCandidate.id
       }
 
       for (const stateResult of state_results) {
@@ -138,13 +138,24 @@ app.post("/api/elections", async (req, res) => {
           }
         });
 
+        const uniqueCandidateEv = stateResult.candidate_ev.reduce((acc: any[], candidateEv: any) => {
+          const electionCandidateId =
+            electionCandidateMap[`${candidateEv.name}_president`] ??
+            electionCandidateMap[`${candidateEv.name}_vice_president`]
+
+          if (!acc.find(x => x.election_candidate_id === electionCandidateId)) {
+            acc.push({ ...candidateEv, election_candidate_id: electionCandidateId })
+          }
+          return acc
+        }, [])
+
         await tx.stateResultCandidate.createMany({
-          data: stateResult.candidate_ev.map((candidateEv: any) => ({
+          data: uniqueCandidateEv.map((candidateEv: any) => ({
             state_result_id: dbStateResult.id,
-            election_candidate_id: electionCandidateMap[candidateEv.name],
+            election_candidate_id: candidateEv.election_candidate_id,
             ev_count: candidateEv.ev_count,
           }))
-        });
+        })
       }
     }, {
       timeout: 30000

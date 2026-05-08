@@ -1,5 +1,11 @@
 from bs4 import BeautifulSoup
-from constants import YEARS, BASE_URL, PARTY_NORMALIZATION, STATES_NORMALIZATION
+from constants import (
+    YEARS,
+    BASE_URL,
+    PARTY_NORMALIZATION,
+    STATES_NORMALIZATION,
+    NICKNAMES,
+)
 import requests
 from urllib.request import Request, urlopen
 import re
@@ -205,7 +211,6 @@ class Scraper:
                 text = td.get_text().strip().replace("(", "").replace(")", "")
                 num_votes = 0 if "-" in text else int(text)
                 state_votes.append(num_votes)
-            print(state_name, "----")
             votes.append(
                 {
                     "state": state_name,
@@ -255,8 +260,8 @@ def names_match(name1: str, name2: str) -> bool:
     parts2 = name2.lower().replace(".", "").split()
     if parts1[-1] != parts2[-1]:
         return False
-    first1 = parts1[0]
-    first2 = parts2[0]
+    first1 = NICKNAMES.get(parts1[0], parts1[0])
+    first2 = NICKNAMES.get(parts2[0], parts2[0])
     return first1.startswith(first2) or first2.startswith(first1)
 
 
@@ -344,19 +349,17 @@ def format_data(general_info, votes, year):
 
 
 def main():
-    # my_years = [2020, 2016, 2012, 2008, 2004, 2000]
-    my_years = [2008]
+    my_years = [1968]
+    # my_years = [2008]
     for year in reversed(my_years):
         print(f"\n--------Scraping: {year}-----------")
         loader = Loader(year)
         scraper = Scraper(year, loader)
         general_info, votes = scraper.scrape()
         data = format_data(general_info, votes, year)
-        print(data["candidates"])
-
-        # response_delete = requests.delete(f"http://localhost:3000/api/elections/{year}")
-        # response_post = requests.post("http://localhost:3000/api/elections", json=data)
-        # print(response_post)
+        response_delete = requests.delete(f"http://localhost:3000/api/elections/{year}")
+        response_post = requests.post("http://localhost:3000/api/elections", json=data)
+        print(response_post)
 
 
 main()

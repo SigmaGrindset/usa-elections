@@ -6,7 +6,7 @@ export const AppLayout = () => {
 
   return (
     <div className="bg-primary min-h-screen text-text font-dm">
-      <Navbar />
+      {/* <Navbar /> */}
       <main className="container-app">
         <Outlet />
       </main>

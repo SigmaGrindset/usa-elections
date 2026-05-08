@@ -1,5 +1,14 @@
 BASE_URL = "https://www.archives.gov/electoral-college/"
-
+NICKNAMES = {
+    "bob": "robert",
+    "bill": "william",
+    "dick": "richard",
+    "jack": "john",
+    "jim": "james",
+    "ted": "edward",
+    "mike": "michael",
+    "al": "albert",
+}
 PARTY_NORMALIZATION = {
     "R": "Republican",
     "D": "Democratic",
