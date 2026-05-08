@@ -14,6 +14,45 @@ const app = express()
 app.use(express.json())
 app.use(morgan("dev"));
 
+app.delete("/api/elections/:year", async (req, res) => {
+  const year = parseInt(req.params.year)
+
+  try {
+    const election = await prisma.election.findUnique({ where: { year } })
+
+    if (!election) {
+      return res.status(404).json({ success: false, error: `Election ${year} not found` })
+    }
+
+    await prisma.$transaction(async (tx) => {
+      const stateResults = await tx.stateResult.findMany({ where: { election_year: year } })
+      const stateResultIds = stateResults.map(s => s.id)
+
+      await tx.stateResultCandidate.deleteMany({
+        where: { state_result_id: { in: stateResultIds } }
+      })
+
+      await tx.stateResult.deleteMany({ where: { election_year: year } })
+
+      const electionCandidates = await tx.electionCandidate.findMany({ where: { election_year: year } })
+      const electionCandidateIds = electionCandidates.map(c => c.id)
+
+      await tx.stateResultCandidate.deleteMany({
+        where: { election_candidate_id: { in: electionCandidateIds } }
+      })
+
+      await tx.electionCandidate.deleteMany({ where: { election_year: year } })
+
+      await tx.election.delete({ where: { year } })
+    })
+
+    res.json({ success: true })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ success: false, error: (error as Error).message })
+  }
+})
+
 app.get("/api/elections/:year", async (req, res) => {
   const year = parseInt(req.params.year);
 
