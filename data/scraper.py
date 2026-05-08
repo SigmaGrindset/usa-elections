@@ -305,11 +305,12 @@ def format_data(general_info, votes, year):
             candidate_obj["role"] = "president"
         elif general_info["president_name"] == candidate_obj["name"]:
             candidate_obj["role"] = "president"
-        elif i < len(candidates) / 2:
+        elif i < len(candidates) // 2:
             candidate_obj["role"] = "president"
 
         if totals[i] == winner_total:
             candidate_obj["is_winner"] = True
+        print(candidate_obj)
         results["candidates"].append(candidate_obj)
 
     others = [c for c in results["candidates"] if c["name"] == "Other"]
@@ -349,7 +350,7 @@ def format_data(general_info, votes, year):
 
 
 def main():
-    my_years = [1968]
+    my_years = [1960]
     # my_years = [2008]
     for year in reversed(my_years):
         print(f"\n--------Scraping: {year}-----------")
@@ -357,9 +358,10 @@ def main():
         scraper = Scraper(year, loader)
         general_info, votes = scraper.scrape()
         data = format_data(general_info, votes, year)
-        response_delete = requests.delete(f"http://localhost:3000/api/elections/{year}")
-        response_post = requests.post("http://localhost:3000/api/elections", json=data)
-        print(response_post)
+        # print(data["candidates"])
+        # response_delete = requests.delete(f"http://localhost:3000/api/elections/{year}")
+        # response_post = requests.post("http://localhost:3000/api/elections", json=data)
+        # print(response_post)
 
 
 main()
