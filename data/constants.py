@@ -9,6 +9,13 @@ NICKNAMES = {
     "mike": "michael",
     "al": "albert",
 }
+PRESIDENT_COUNT = {
+    1836: 3,
+    1840: 2,
+    1816: 2,
+    1808: 3,
+    1820: 2,
+}
 PARTY_NORMALIZATION = {
     "R": "Republican",
     "D": "Democratic",

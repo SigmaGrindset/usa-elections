@@ -5,6 +5,7 @@ from constants import (
     PARTY_NORMALIZATION,
     STATES_NORMALIZATION,
     NICKNAMES,
+    PRESIDENT_COUNT,
 )
 import requests
 from urllib.request import Request, urlopen
@@ -227,6 +228,8 @@ class Scraper:
         for td in tds:
             if "Total" in td.get_text():
                 continue
+            for sup in td.find_all("sup"):
+                sup.decompose()
             votes = td.get_text().strip().split("(")[0]
             votes = 0 if "-" in votes else int(votes)
             totals.append(votes)
@@ -239,7 +242,8 @@ class Scraper:
             text = td.get_text()
             split = text.split("of")
             name = split[0].strip()
-            name = name.replace(",", "").replace("*", "")
+            name = re.sub(r"\d+$", "", name).strip()
+            name = name.replace(",", "").replace("*", "").strip()
             candidates.append(name)
         return candidates
 
@@ -283,8 +287,6 @@ def format_data(general_info, votes, year):
     if year != 1789:
         totals = totals[1:]
     results["candidates"] = []
-    winner_total = max(totals)
-
     for i in range(0, len(candidates)):
         candidate_obj = {
             "name": candidates[i],
@@ -301,16 +303,18 @@ def format_data(general_info, votes, year):
                     if party:
                         candidate_obj["party"] = party
 
+        president_count = PRESIDENT_COUNT.get(year, len(candidates) // 2)
         if year <= 1800:
             candidate_obj["role"] = "president"
-        elif general_info["president_name"] == candidate_obj["name"]:
+        elif i < president_count:
+            # elif i < len(candidates) // (3 if year in [1840, 1820, 1816, 1808] else 2):
             candidate_obj["role"] = "president"
-        elif i < len(candidates) // 2:
-            candidate_obj["role"] = "president"
-
-        if totals[i] == winner_total:
+        winner_name = general_info["president_name"]
+        if (
+            names_match(winner_name, candidate_obj["name"])
+            and candidate_obj["role"] == "president"
+        ):
             candidate_obj["is_winner"] = True
-        print(candidate_obj)
         results["candidates"].append(candidate_obj)
 
     others = [c for c in results["candidates"] if c["name"] == "Other"]
@@ -350,7 +354,7 @@ def format_data(general_info, votes, year):
 
 
 def main():
-    my_years = [1960]
+    my_years = [1792]
     # my_years = [2008]
     for year in reversed(my_years):
         print(f"\n--------Scraping: {year}-----------")
@@ -359,9 +363,10 @@ def main():
         general_info, votes = scraper.scrape()
         data = format_data(general_info, votes, year)
         # print(data["candidates"])
-        # response_delete = requests.delete(f"http://localhost:3000/api/elections/{year}")
-        # response_post = requests.post("http://localhost:3000/api/elections", json=data)
-        # print(response_post)
+        # print(votes["candidates"])
+        response_delete = requests.delete(f"http://localhost:3000/api/elections/{year}")
+        response_post = requests.post("http://localhost:3000/api/elections", json=data)
+        print(response_post)
 
 
 main()
