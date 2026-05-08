@@ -3,6 +3,10 @@ import { useQuery } from '@tanstack/react-query'
 import { fetchElection } from '#/api/elections'
 import { PARTY_COLORS } from '#/constants'
 import { years } from '#/constants'
+import { ElectionMap } from '#/components/ui/ElectionMap'
+import { useStateColors } from '#/hooks/useStateColors'
+import { useState } from 'react'
+import { StateDetail } from './components/StateDetail'
 
 export const Election = () => {
   const { year } = useParams({ from: '/_app/election/$year' })
@@ -16,8 +20,10 @@ export const Election = () => {
 
   const prevYear = years[years.indexOf(yearNum) - 1]
   const nextYear = years[years.indexOf(yearNum) + 1]
+  const [selectedState, setSelectedState] = useState<string | null>(null)
 
   const election = data?.data
+  const { getStateColor } = useStateColors(election!)
   const winner = election?.election_candidates.find(c => c.is_winner && c.role === 'president')
   const presidents = election?.election_candidates.filter(c => c.role === 'president') ?? []
   const totalEv = election?.total_ev ?? 0
@@ -113,14 +119,27 @@ export const Election = () => {
       {/* Map + Sidebar */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8">
 
-        {/* Map placeholder */}
-        <div className="bg-white/2 border border-white/6 aspect-video flex items-center justify-center">
-          <span className="text-sm text-white/20 tracking-widest uppercase">Interactive map</span>
+
+        {/* Left column - Map + State detail */}
+        <div className="flex flex-col gap-6">
+          {election && (
+            <ElectionMap
+              getStateColor={getStateColor}
+              onStateClick={(stateName) => setSelectedState(prev => prev === stateName ? null : stateName)}
+              selectedState={selectedState}
+            />
+          )}
+          {selectedState && election && (
+            <StateDetail
+              election={election}
+              stateName={selectedState}
+            />
+          )}
         </div>
+
 
         {/* Sidebar */}
         <div className="flex flex-col gap-6">
-
           {/* Candidates */}
           <div>
             <div className="text-[0.65rem] tracking-[0.18em] uppercase text-muted mb-4">Presidential candidates</div>
@@ -164,6 +183,6 @@ export const Election = () => {
 
         </div>
       </div>
-    </div>
+    </div >
   )
 }

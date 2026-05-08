@@ -30,7 +30,11 @@ app.get("/api/elections/:year", async (req, res) => {
           include: {
             state_result_candidates: {
               include: {
-                election_candidate: true,
+                election_candidate: {
+                  include: {
+                    candidate: true
+                  }
+                }
               }
             }
           }

@@ -232,7 +232,10 @@ class Scraper:
             split = text.split("of")
             name = split[0].strip()
             if len(split) > 1:
-                name = name[0 : len(name) - 1]
+                if "," in name:
+                    name = name[0 : len(name) - 1]
+                else:
+                    name = name[0 : len(name)]
             else:
                 name = name[0 : len(name)]
 
@@ -297,7 +300,7 @@ def format_data(general_info, votes, year):
                     if party:
                         candidate_obj["party"] = party
 
-        if year < 1800:
+        if year <= 1800:
             candidate_obj["role"] = "president"
         elif general_info["president_name"] == candidate_obj["name"]:
             candidate_obj["role"] = "president"
@@ -345,13 +348,15 @@ def format_data(general_info, votes, year):
 
 
 def main():
-    my_years = [2004]
+    my_years = [1960]
     for year in reversed(my_years):
         print(f"\n--------Scraping: {year}-----------")
         loader = Loader(year)
         scraper = Scraper(year, loader)
         general_info, votes = scraper.scrape()
         data = format_data(general_info, votes, year)
+        print(votes["candidates"])
+        print()
         print(data["candidates"])
         # response = requests.post("http://localhost:3000/api/elections", json=data)
         # print(response)
