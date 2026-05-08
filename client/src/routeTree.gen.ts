@@ -11,8 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
-import { Route as AppCompareRouteImport } from './routes/_app/compare'
 import { Route as AppElectionYearRouteImport } from './routes/_app/election.$year'
+import { Route as AppCompareYear1Year2RouteImport } from './routes/_app/compare.$year1.$year2'
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
@@ -23,40 +23,45 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
-const AppCompareRoute = AppCompareRouteImport.update({
-  id: '/compare',
-  path: '/compare',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppElectionYearRoute = AppElectionYearRouteImport.update({
   id: '/election/$year',
   path: '/election/$year',
   getParentRoute: () => AppRoute,
 } as any)
+const AppCompareYear1Year2Route = AppCompareYear1Year2RouteImport.update({
+  id: '/compare/$year1/$year2',
+  path: '/compare/$year1/$year2',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
-  '/compare': typeof AppCompareRoute
   '/election/$year': typeof AppElectionYearRoute
+  '/compare/$year1/$year2': typeof AppCompareYear1Year2Route
 }
 export interface FileRoutesByTo {
-  '/compare': typeof AppCompareRoute
   '/': typeof AppIndexRoute
   '/election/$year': typeof AppElectionYearRoute
+  '/compare/$year1/$year2': typeof AppCompareYear1Year2Route
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
-  '/_app/compare': typeof AppCompareRoute
   '/_app/': typeof AppIndexRoute
   '/_app/election/$year': typeof AppElectionYearRoute
+  '/_app/compare/$year1/$year2': typeof AppCompareYear1Year2Route
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/compare' | '/election/$year'
+  fullPaths: '/' | '/election/$year' | '/compare/$year1/$year2'
   fileRoutesByTo: FileRoutesByTo
-  to: '/compare' | '/' | '/election/$year'
-  id: '__root__' | '/_app' | '/_app/compare' | '/_app/' | '/_app/election/$year'
+  to: '/' | '/election/$year' | '/compare/$year1/$year2'
+  id:
+    | '__root__'
+    | '/_app'
+    | '/_app/'
+    | '/_app/election/$year'
+    | '/_app/compare/$year1/$year2'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -79,13 +84,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/compare': {
-      id: '/_app/compare'
-      path: '/compare'
-      fullPath: '/compare'
-      preLoaderRoute: typeof AppCompareRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/_app/election/$year': {
       id: '/_app/election/$year'
       path: '/election/$year'
@@ -93,19 +91,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppElectionYearRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/compare/$year1/$year2': {
+      id: '/_app/compare/$year1/$year2'
+      path: '/compare/$year1/$year2'
+      fullPath: '/compare/$year1/$year2'
+      preLoaderRoute: typeof AppCompareYear1Year2RouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
-  AppCompareRoute: typeof AppCompareRoute
   AppIndexRoute: typeof AppIndexRoute
   AppElectionYearRoute: typeof AppElectionYearRoute
+  AppCompareYear1Year2Route: typeof AppCompareYear1Year2Route
 }
 
 const AppRouteChildren: AppRouteChildren = {
-  AppCompareRoute: AppCompareRoute,
   AppIndexRoute: AppIndexRoute,
   AppElectionYearRoute: AppElectionYearRoute,
+  AppCompareYear1Year2Route: AppCompareYear1Year2Route,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

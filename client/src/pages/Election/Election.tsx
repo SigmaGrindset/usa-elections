@@ -91,7 +91,8 @@ export const Election = () => {
               key={c.id}
               style={{
                 width: `${(c.total_ev / totalEv) * 100}%`,
-                background: PARTY_COLORS[c.party as keyof typeof PARTY_COLORS] ?? '#888'
+                background: PARTY_COLORS[c.party as keyof typeof PARTY_COLORS] ?? '#888',
+                borderRight: c.party !== 'Unknown' ? '2px solid #0a0a0f' : 'none'
               }}
             />
           ))}
