@@ -1,11 +1,52 @@
-# usa-elections
-Web-aplikacija za vizualizaciju rezultata izbora u Sjedinjenim Američkim Državama
+# USA Elections
 
-Zadatak:
-Razvoj web-aplikacije za vizualizaciju rezultata izbora u Sjedinjenim Američkim Državama
+Web aplikacija za vizualizaciju rezultata predsjedničkih izbora u Sjedinjenim Američkim Državama od 1789. do 2024. godine.
 
-Zadatak (engl.):
-Development of a web application for visualization of election results in the United States of America
+## Tehnologije
 
-Opis zadatka:
-Vaš zadatak je razvoj web-aplikacije koja će omogućiti vizualizaciju službenih rezultata predsjedničkih izbora održanih u Sjedinjenim Američkim Državama. U radu trebate predložiti i implementirati postupak za prikupljanje i obradu službenih podataka o provedenim izborima iz izvora dostupnih na Internetu. Web-aplikacija treba omogućiti korisnicima odabir održanih izbora i detaljan vizualni prikaz svih rezultata na interaktivnoj karti. Korisnici će moći odabrati prikaz skupnih rezultata kao i rezultata po pojedinačnim državama. Isto tako aplikacija će omogućiti međusobnu usporedbu rezultata dvaju različitih održanih izbora. Možete po volji izabrati tehnologije za vizualizaciju podataka, izradu korisničkog sučelja i poslužiteljskog dijela web-aplikacije te izgradnju baze podataka. Isto tako u radu trebate opisati sve tehnologije koje ste odabrali za izradu rješenja.
+### Scraping
+
+Podaci su prikupljeni scrapeanjem službenih stranica **National Archivesa** (`archives.gov/electoral-college`). Za svaku godinu izbora scraper prikuplja podatke o kandidatima, strankama, broju electoral votesa po kandidatu i broju electoral votesa po saveznoj državi.
+
+- **Python**
+- **BeautifulSoup4** - parsiranje HTML stranica
+
+### Baza podataka
+
+Podaci su pohranjeni u **PostgreSQL** bazu podataka. Shema se sastoji od pet tablica: `Election`, `Candidate`, `ElectionCandidate`, `StateResult` i `StateResultCandidate`.
+
+- **PostgreSQL** - relacijska baza podataka
+- **Neon** - cloud hosting PostgreSQL baze
+
+### Backend
+
+REST API koji izlaže endpoint za dohvat podataka o izborima. Deployano na **Vercel**.
+
+- **Node.js**
+- **Express**
+- **pg** - PostgreSQL klijent za Node.js
+
+### Frontend
+
+Single Page Application koja vizualizira podatke o izborima. Deployano na **Vercel**.
+
+- **React** - UI library
+- **TypeScript**
+- **TanStack Router** - client-side routing
+- **TanStack Query** - dohvat i caching podataka
+- **Tailwind CSS** - styles
+- **D3** - interaktivna karta SAD-a
+
+## Stranice
+
+### Početna stranica (`/`)
+
+Prikazuje kratki opis aplikacije i njenih mogućnosti, navigaciju s linkovima na sve predsjedničke izbore grupirane po desetljećima, odabir dvaju izbora za usporedbu te objašnjenje kako funkcionira Electoral College.
+
+### Pregled izbora (`/election/:year`)
+
+Prikazuje rezultate predsjedničkih izbora za odabranu godinu. Uključuje pobjednika s brojem electoral votesa, interaktivnu kartu SAD-a gdje je svaka savezna država obojena bojom stranke pobjednika, te detalje o rezultatima po saveznoj državi.
+
+### Usporedba izbora (`/compare/:year1/:year2`)
+
+Omogućuje usporedbu dvaju izbora. Prikazuje pobjednike i electoral votese za oba izbora, dvije karte SAD-a jednu pored druge, kartu swing stateova (saveznih država koje su promijenile stranku između dvaju izbora) te listu svih swing stateova.
