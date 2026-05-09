@@ -1,6 +1,5 @@
-import 'dotenv/config'
-import { PrismaClient } from '../prisma/generated/client'
-import { PrismaPg } from '@prisma/adapter-pg'
+// import { PrismaClient } from '../prisma/generated/client'
+// import { PrismaPg } from '@prisma/adapter-pg'
 import express from 'express'
 const morgan = require("morgan");
 require("dotenv").config();
@@ -167,7 +166,10 @@ app.use(morgan("dev"));
 //   }
 // });
 app.get("/api/test", (req, res) => {
-  return res.json({ res: "Response" })
+  return res.json({ res: "Response /api/test" })
+})
+app.get("/", (req, res) => {
+  return res.json({ res: "Response /" })
 })
 
 const port = process.env.PORT || 3000;
