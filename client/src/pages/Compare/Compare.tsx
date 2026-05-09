@@ -7,9 +7,8 @@ import { ElectionMap } from '#/components/ui/ElectionMap'
 
 export const Compare = () => {
   const { year1, year2 } = useParams({ from: '/_app/compare/$year1/$year2' })
-  const year1_ = parseInt(year1)
-  const year2_ = parseInt(year2)
-  const [y1, y2] = [year1_, year2_].sort((a, b) => a - b)
+  const y1 = parseInt(year1)
+  const y2 = parseInt(year2)
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['compare', y1, y2],
