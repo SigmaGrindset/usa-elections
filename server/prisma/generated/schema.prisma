@@ -1,15 +1,14 @@
 generator client {
-  provider   = "prisma-client"
-  output     = "./generated"
+  provider = "prisma-client-js"
+  output   = "./generated"
 }
 
 datasource db {
-   provider = "postgresql"
-    url = env("DATABASE_URL")
+  provider = "postgresql"
 }
 
 model Election {
-  year        Int      @id
+  year        Int @id
   total_ev    Int
   majority_ev Int
 
@@ -18,22 +17,22 @@ model Election {
 }
 
 model Candidate {
-  id    Int    @id @default(autoincrement())
-  name  String
+  id   Int    @id @default(autoincrement())
+  name String
 
   election_candidates ElectionCandidate[]
 }
 
 model ElectionCandidate {
-  id            Int     @id @default(autoincrement())
-  election_year Int
-  candidate_id  Int
-  role          String
-  total_ev      Int
-  is_winner     Boolean
-  party         String
-  election              Election               @relation(fields: [election_year], references: [year])
-  candidate             Candidate              @relation(fields: [candidate_id], references: [id])
+  id                      Int                    @id @default(autoincrement())
+  election_year           Int
+  candidate_id            Int
+  role                    String
+  total_ev                Int
+  is_winner               Boolean
+  party                   String
+  election                Election               @relation(fields: [election_year], references: [year])
+  candidate               Candidate              @relation(fields: [candidate_id], references: [id])
   state_result_candidates StateResultCandidate[]
 }
 
