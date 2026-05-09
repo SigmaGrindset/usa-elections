@@ -2,6 +2,7 @@ import { Pool } from 'pg'
 import express from 'express'
 const morgan = require("morgan");
 require("dotenv").config();
+const cors = require("cors")
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL })
 
@@ -9,6 +10,7 @@ const app = express()
 
 app.use(express.json())
 app.use(morgan("dev"));
+app.use(cors(process.env.CLIENT_URL))
 
 app.delete("/api/elections/:year", async (req, res) => {
   const year = parseInt(req.params.year)
