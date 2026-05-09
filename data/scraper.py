@@ -354,8 +354,7 @@ def format_data(general_info, votes, year):
 
 
 def main():
-    my_years = [2016]
-    # my_years = [2008]
+    my_years = YEARS
     for year in reversed(my_years):
         print(f"\n--------Scraping: {year}-----------")
         loader = Loader(year)

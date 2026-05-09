@@ -1,174 +1,228 @@
-import { PrismaClient } from '../prisma/generated/client'
-import { PrismaPg } from '@prisma/adapter-pg'
+import { Pool } from 'pg'
 import express from 'express'
 const morgan = require("morgan");
 require("dotenv").config();
 
-const pool = new PrismaPg({ connectionString: process.env.DATABASE_URL! })
-const prisma = new PrismaClient({ adapter: pool })
+const pool = new Pool({ connectionString: process.env.DATABASE_URL })
 
 const app = express()
 
 app.use(express.json())
 app.use(morgan("dev"));
 
-// app.delete("/api/elections/:year", async (req, res) => {
-//   const year = parseInt(req.params.year)
+app.delete("/api/elections/:year", async (req, res) => {
+  const year = parseInt(req.params.year)
+  const client = await pool.connect()
 
-//   try {
-//     const election = await prisma.election.findUnique({ where: { year } })
+  try {
+    const election = await client.query('SELECT * FROM "Election" WHERE year = $1', [year])
 
-//     if (!election) {
-//       return res.status(404).json({ success: false, error: `Election ${year} not found` })
-//     }
+    if (election.rows.length === 0) {
+      return res.status(404).json({ success: false, error: `Election ${year} not found` })
+    }
 
-//     await prisma.$transaction(async (tx) => {
-//       const stateResults = await tx.stateResult.findMany({ where: { election_year: year } })
-//       const stateResultIds = stateResults.map(s => s.id)
+    await client.query('BEGIN')
 
-//       await tx.stateResultCandidate.deleteMany({
-//         where: { state_result_id: { in: stateResultIds } }
-//       })
+    const stateResults = await client.query('SELECT id FROM "StateResult" WHERE election_year = $1', [year])
+    const stateResultIds = stateResults.rows.map((r: any) => r.id)
 
-//       await tx.stateResult.deleteMany({ where: { election_year: year } })
+    if (stateResultIds.length > 0) {
+      await client.query('DELETE FROM "StateResultCandidate" WHERE state_result_id = ANY($1)', [stateResultIds])
+    }
 
-//       const electionCandidates = await tx.electionCandidate.findMany({ where: { election_year: year } })
-//       const electionCandidateIds = electionCandidates.map(c => c.id)
+    await client.query('DELETE FROM "StateResult" WHERE election_year = $1', [year])
 
-//       await tx.stateResultCandidate.deleteMany({
-//         where: { election_candidate_id: { in: electionCandidateIds } }
-//       })
+    const electionCandidates = await client.query('SELECT id FROM "ElectionCandidate" WHERE election_year = $1', [year])
+    const electionCandidateIds = electionCandidates.rows.map((r: any) => r.id)
 
-//       await tx.electionCandidate.deleteMany({ where: { election_year: year } })
+    if (electionCandidateIds.length > 0) {
+      await client.query('DELETE FROM "StateResultCandidate" WHERE election_candidate_id = ANY($1)', [electionCandidateIds])
+    }
 
-//       await tx.election.delete({ where: { year } })
-//     })
+    await client.query('DELETE FROM "ElectionCandidate" WHERE election_year = $1', [year])
+    await client.query('DELETE FROM "Election" WHERE year = $1', [year])
 
-//     res.json({ success: true })
-//   } catch (error) {
-//     console.error(error)
-//     res.status(500).json({ success: false, error: (error as Error).message })
-//   }
-// })
+    await client.query('COMMIT')
 
-// app.get("/api/elections/:year", async (req, res) => {
-//   const year = parseInt(req.params.year);
+    res.json({ success: true })
+  } catch (error) {
+    await client.query('ROLLBACK')
+    console.error(error)
+    res.status(500).json({ success: false, error: (error as Error).message })
+  } finally {
+    client.release()
+  }
+})
 
-//   try {
-//     const election = await prisma.election.findUnique({
-//       where: { year },
-//       include: {
-//         election_candidates: {
-//           include: {
-//             candidate: true,
-//           }
-//         },
-//         state_results: {
-//           include: {
-//             state_result_candidates: {
-//               include: {
-//                 election_candidate: {
-//                   include: {
-//                     candidate: true
-//                   }
-//                 }
-//               }
-//             }
-//           }
-//         }
-//       }
-//     });
+app.get("/api/elections/:year", async (req, res) => {
+  const year = parseInt(req.params.year)
+  const client = await pool.connect()
 
-//     if (!election) {
-//       return res.status(404).json({ success: false, error: `Election ${year} not found` });
-//     }
-//     console.log(election)
-//     res.json({ success: true, data: election });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ success: false, error: (error as Error).message });
-//   }
-// });
+  try {
+    const electionRes = await client.query('SELECT * FROM "Election" WHERE year = $1', [year])
 
-// app.post("/api/elections", async (req, res) => {
-//   const { year, total_ev, majority_ev, candidates, state_results } = req.body;
-//   try {
-//     await prisma.$transaction(async (tx) => {
-//       await tx.election.create({
-//         data: { year, total_ev, majority_ev }
-//       });
+    if (electionRes.rows.length === 0) {
+      return res.status(404).json({ success: false, error: `Election ${year} not found` })
+    }
 
-//       const electionCandidateMap: { [key: string]: number } = {};
+    const election = electionRes.rows[0]
 
-//       for (const candidate of candidates) {
-//         let dbCandidate = await tx.candidate.findFirst({
-//           where: { name: candidate.name }
-//         });
+    const electionCandidatesRes = await client.query(`
+      SELECT ec.*, c.name as candidate_name
+      FROM "ElectionCandidate" ec
+      JOIN "Candidate" c ON c.id = ec.candidate_id
+      WHERE ec.election_year = $1
+    `, [year])
 
-//         if (!dbCandidate) {
-//           dbCandidate = await tx.candidate.create({
-//             data: {
-//               name: candidate.name,
-//             }
-//           });
-//         }
+    const stateResultsRes = await client.query(`
+      SELECT * FROM "StateResult" WHERE election_year = $1
+    `, [year])
 
-//         const electionCandidate = await tx.electionCandidate.create({
-//           data: {
-//             election_year: year,
-//             candidate_id: dbCandidate.id,
-//             role: candidate.role,
-//             total_ev: candidate.total_ev,
-//             is_winner: candidate.is_winner,
-//             party: candidate.party
-//           }
-//         });
+    const stateResultIds = stateResultsRes.rows.map((r: any) => r.id)
 
-//         electionCandidateMap[`${candidate.name}_${candidate.role}`] = electionCandidate.id
-//       }
+    let stateResultCandidates: any[] = []
+    if (stateResultIds.length > 0) {
+      const srcRes = await client.query(`
+        SELECT src.*,
+               ec.id as ec_id, ec.election_year, ec.candidate_id, ec.role, ec.total_ev, ec.is_winner, ec.party,
+               c.id as c_id, c.name as candidate_name
+        FROM "StateResultCandidate" src
+        JOIN "ElectionCandidate" ec ON ec.id = src.election_candidate_id
+        JOIN "Candidate" c ON c.id = ec.candidate_id
+        WHERE src.state_result_id = ANY($1)
+      `, [stateResultIds])
+      stateResultCandidates = srcRes.rows
+    }
 
-//       for (const stateResult of state_results) {
-//         const dbStateResult = await tx.stateResult.create({
-//           data: {
-//             election_year: year,
-//             state_name: stateResult.state_name,
-//             total_ev: stateResult.total_ev,
-//           }
-//         });
+    const data = {
+      year: election.year,
+      total_ev: election.total_ev,
+      majority_ev: election.majority_ev,
+      election_candidates: electionCandidatesRes.rows.map((ec: any) => ({
+        id: ec.id,
+        election_year: ec.election_year,
+        candidate_id: ec.candidate_id,
+        role: ec.role,
+        total_ev: ec.total_ev,
+        is_winner: ec.is_winner,
+        party: ec.party,
+        candidate: { id: ec.candidate_id, name: ec.candidate_name }
+      })),
+      state_results: stateResultsRes.rows.map((sr: any) => ({
+        id: sr.id,
+        election_year: sr.election_year,
+        state_name: sr.state_name,
+        total_ev: sr.total_ev,
+        state_result_candidates: stateResultCandidates
+          .filter((src: any) => src.state_result_id === sr.id)
+          .map((src: any) => ({
+            id: src.id,
+            state_result_id: src.state_result_id,
+            election_candidate_id: src.election_candidate_id,
+            ev_count: src.ev_count,
+            election_candidate: {
+              id: src.ec_id,
+              election_year: src.election_year,
+              candidate_id: src.candidate_id,
+              role: src.role,
+              total_ev: src.total_ev,
+              is_winner: src.is_winner,
+              party: src.party,
+              candidate: { id: src.c_id, name: src.candidate_name }
+            }
+          }))
+      }))
+    }
 
-//         const uniqueCandidateEv = stateResult.candidate_ev.reduce((acc: any[], candidateEv: any) => {
-//           const electionCandidateId =
-//             electionCandidateMap[`${candidateEv.name}_president`] ??
-//             electionCandidateMap[`${candidateEv.name}_vice_president`]
+    res.json({ success: true, data })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ success: false, error: (error as Error).message })
+  } finally {
+    client.release()
+  }
+})
 
-//           if (!acc.find(x => x.election_candidate_id === electionCandidateId)) {
-//             acc.push({ ...candidateEv, election_candidate_id: electionCandidateId })
-//           }
-//           return acc
-//         }, [])
+app.post("/api/elections", async (req, res) => {
+  const { year, total_ev, majority_ev, candidates, state_results } = req.body
+  const client = await pool.connect()
 
-//         await tx.stateResultCandidate.createMany({
-//           data: uniqueCandidateEv.map((candidateEv: any) => ({
-//             state_result_id: dbStateResult.id,
-//             election_candidate_id: candidateEv.election_candidate_id,
-//             ev_count: candidateEv.ev_count,
-//           }))
-//         })
-//       }
-//     }, {
-//       timeout: 30000
-//     });
+  try {
+    const existing = await client.query('SELECT * FROM "Election" WHERE year = $1', [year])
+    if (existing.rows.length > 0) {
+      return res.status(409).json({ success: false, error: `Election ${year} already exists` })
+    }
 
-//     res.json({ success: true });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ success: false, error: (error as Error).message });
-//   }
-// });
+    await client.query('BEGIN')
+
+    await client.query(
+      'INSERT INTO "Election" (year, total_ev, majority_ev) VALUES ($1, $2, $3)',
+      [year, total_ev, majority_ev]
+    )
+
+    const electionCandidateMap: { [key: string]: number } = {}
+
+    for (const candidate of candidates) {
+      let candidateRes = await client.query('SELECT * FROM "Candidate" WHERE name = $1', [candidate.name])
+      let dbCandidate = candidateRes.rows[0]
+
+      if (!dbCandidate) {
+        const newCandidate = await client.query(
+          'INSERT INTO "Candidate" (name) VALUES ($1) RETURNING *',
+          [candidate.name]
+        )
+        dbCandidate = newCandidate.rows[0]
+      }
+
+      const electionCandidateRes = await client.query(
+        'INSERT INTO "ElectionCandidate" (election_year, candidate_id, role, total_ev, is_winner, party) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+        [year, dbCandidate.id, candidate.role, candidate.total_ev, candidate.is_winner, candidate.party]
+      )
+
+      electionCandidateMap[`${candidate.name}_${candidate.role}`] = electionCandidateRes.rows[0].id
+    }
+
+    for (const stateResult of state_results) {
+      const stateResultRes = await client.query(
+        'INSERT INTO "StateResult" (election_year, state_name, total_ev) VALUES ($1, $2, $3) RETURNING *',
+        [year, stateResult.state_name, stateResult.total_ev]
+      )
+      const stateResultId = stateResultRes.rows[0].id
+
+      const uniqueCandidateEv = stateResult.candidate_ev.reduce((acc: any[], candidateEv: any) => {
+        const electionCandidateId =
+          electionCandidateMap[`${candidateEv.name}_president`] ??
+          electionCandidateMap[`${candidateEv.name}_vice_president`]
+
+        if (!acc.find((x: any) => x.election_candidate_id === electionCandidateId)) {
+          acc.push({ ...candidateEv, election_candidate_id: electionCandidateId })
+        }
+        return acc
+      }, [])
+
+      for (const candidateEv of uniqueCandidateEv) {
+        await client.query(
+          'INSERT INTO "StateResultCandidate" (state_result_id, election_candidate_id, ev_count) VALUES ($1, $2, $3)',
+          [stateResultId, candidateEv.election_candidate_id, candidateEv.ev_count]
+        )
+      }
+    }
+
+    await client.query('COMMIT')
+    res.json({ success: true })
+  } catch (error) {
+    await client.query('ROLLBACK')
+    console.error(error)
+    res.status(500).json({ success: false, error: (error as Error).message })
+  } finally {
+    client.release()
+  }
+})
 
 app.get("/api/test", (req, res) => {
   return res.json({ res: "Response /api/test" })
 })
+
 app.get("/", (req, res) => {
   return res.json({ res: "Response /" })
 })
