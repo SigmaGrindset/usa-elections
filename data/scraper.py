@@ -363,8 +363,8 @@ def main():
         data = format_data(general_info, votes, year)
         # print(data["candidates"])
         # print(votes["candidates"])
-        response_delete = requests.delete(f"http://localhost:3000/api/elections/{year}")
-        response_post = requests.post("http://localhost:3000/api/elections", json=data)
+        response_delete = requests.delete(f"http://localhost:3000/api/election/{year}")
+        response_post = requests.post("http://localhost:3000/api/election", json=data)
         print(response_post)
 
 
