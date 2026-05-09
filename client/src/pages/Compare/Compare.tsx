@@ -3,11 +3,13 @@ import { useQuery } from '@tanstack/react-query'
 import { fetchElections } from '#/api/elections'
 import { PARTY_COLORS } from '#/constants'
 import type { Election, ElectionCandidate } from '#/types'
+import { ElectionMap } from '#/components/ui/ElectionMap'
 
 export const Compare = () => {
   const { year1, year2 } = useParams({ from: '/_app/compare/$year1/$year2' })
-  const y1 = parseInt(year1)
-  const y2 = parseInt(year2)
+  const year1_ = parseInt(year1)
+  const year2_ = parseInt(year2)
+  const [y1, y2] = [year1_, year2_].sort((a, b) => a - b)
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['compare', y1, y2],
@@ -67,6 +69,30 @@ export const Compare = () => {
 
   const getCandidateColor = (c: ElectionCandidate) =>
     PARTY_COLORS[c.party as keyof typeof PARTY_COLORS] ?? '#888'
+
+  const getSwingStateColor = (stateName: string): string => {
+    const [base, newer] = [election1, election2].sort((a, b) => a.year - b.year)
+
+    const getStateWinner = (election: Election, name: string) => {
+      const stateResult = election.state_results.find(s => s.state_name === name)
+      if (!stateResult) return null
+
+      return stateResult.state_result_candidates
+        .filter(c => c.election_candidate.role === 'president')
+        .sort((a, b) => b.ev_count - a.ev_count)[0]
+    }
+
+    const baseWinner = getStateWinner(base, stateName)
+    const newerWinner = getStateWinner(newer, stateName)
+
+    if (!baseWinner || !newerWinner) return 'rgba(255,255,255,0.05)'
+
+    if (baseWinner.election_candidate.party === newerWinner.election_candidate.party) {
+      return 'rgba(255,255,255,0.08)'
+    }
+
+    return PARTY_COLORS[newerWinner.election_candidate.party as keyof typeof PARTY_COLORS] ?? '#888'
+  }
 
   return (
     <div className="py-10">
@@ -130,9 +156,41 @@ export const Compare = () => {
         ))}
       </div>
 
-      {/* Map placeholder */}
-      <div className="bg-white/[0.02] border border-white/6 aspect-video flex items-center justify-center mb-10">
-        <span className="text-sm text-muted tracking-widest uppercase">Interactive map</span>
+
+
+      {/* Two maps side by side */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+        {[
+          { election: election1, year: year1 },
+          { election: election2, year: year2 }
+        ].map(({ election, year }) => (
+          <div key={year}>
+            <div className="text-[0.65rem] tracking-[0.18em] uppercase text-muted mb-4">{year}</div>
+            <ElectionMap
+              getStateColor={(stateName) => {
+                const stateResult = election.state_results.find(s => s.state_name === stateName)
+                if (!stateResult) return 'rgba(255,255,255,0.05)'
+
+                const winner = stateResult.state_result_candidates
+                  .filter(c => c.election_candidate.role === 'president')
+                  .sort((a, b) => b.ev_count - a.ev_count)[0]
+
+                if (!winner) return 'rgba(255,255,255,0.05)'
+
+                return PARTY_COLORS[winner.election_candidate.party as keyof typeof PARTY_COLORS] ?? '#888'
+              }}
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Swing state map */}
+      <div className="mb-4">
+        <div className="text-[0.65rem] tracking-[0.18em] uppercase text-muted mb-1">Swing State Map</div>
+        <p className="text-xs text-muted/60 mb-6">
+          Colored states changed party between {[y1, y2].sort((a, b) => a - b).join(' and ')}. Color indicates the party that won in {[y1, y2].sort((a, b) => a - b)[1]}.
+        </p>
+        <ElectionMap getStateColor={getSwingStateColor} />
       </div>
 
       {/* Swing states */}
@@ -155,26 +213,6 @@ export const Compare = () => {
         )}
       </div>
 
-      {/* Candidates comparison */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {[{ presidents: presidents1, year: year1 }, { presidents: presidents2, year: year2 }].map(({ presidents, year }) => (
-          <div key={year}>
-            <div className="text-[0.65rem] tracking-[0.18em] uppercase text-muted mb-4">{year} Candidates</div>
-            {presidents.map(c => (
-              <div key={c.id} className="flex items-center gap-3 py-3 border-b border-white/4 last:border-0">
-                <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: getCandidateColor(c) }} />
-                <div className="flex-1">
-                  <div className="text-sm">{c.candidate.name}</div>
-                  <div className="text-xs text-muted font-light">{c.party}</div>
-                </div>
-                <div className="font-playfair text-lg font-bold" style={{ color: getCandidateColor(c) }}>
-                  {c.total_ev}
-                </div>
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
 
     </div>
   )

@@ -8,7 +8,7 @@ export const Navbar = () => {
       </Link>
       <div className="hidden md:flex gap-8">
         <Link to="/election/$year" params={{ year: '2024' }} className="text-white/50 text-sm font-medium tracking-wide hover:text-white transition-colors">Results</Link>
-        <Link to="/compare" className="text-white/50 text-sm font-medium tracking-wide hover:text-white transition-colors">Compare</Link>
+        {/* <Link to="/compare" className="text-white/50 text-sm font-medium tracking-wide hover:text-white transition-colors">Compare</Link> */}
       </div>
     </nav>
   )

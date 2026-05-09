@@ -354,7 +354,7 @@ def format_data(general_info, votes, year):
 
 
 def main():
-    my_years = [1792]
+    my_years = [2016]
     # my_years = [2008]
     for year in reversed(my_years):
         print(f"\n--------Scraping: {year}-----------")

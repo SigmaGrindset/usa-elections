@@ -12,6 +12,8 @@ export const Election = () => {
   const { year } = useParams({ from: '/_app/election/$year' })
   const navigate = useNavigate()
   const yearNum = parseInt(year)
+  const [compareOpen, setCompareOpen] = useState(false)
+  const [compareYear, setCompareYear] = useState<string>('')
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['election', yearNum],
@@ -45,7 +47,7 @@ export const Election = () => {
         {prevYear && (
           <button
             onClick={() => navigate({ to: '/election/$year', params: { year: String(prevYear) } })}
-            className="text-sm text-muted border border-white/8 px-3 py-1 rounded-sm hover:text-white/70 transition-colors"
+            className="cursor-pointer text-sm text-muted border border-white/8 px-3 py-1 rounded-sm hover:text-white/70 transition-colors"
           >
             ← {prevYear}
           </button>
@@ -56,10 +58,43 @@ export const Election = () => {
         {nextYear && (
           <button
             onClick={() => navigate({ to: '/election/$year', params: { year: String(nextYear) } })}
-            className="text-sm text-muted border border-white/8 px-3 py-1 rounded-sm hover:text-white/70 transition-colors"
+            className="cursor-pointer text-sm text-muted border border-white/8 px-3 py-1 rounded-sm hover:text-white/70 transition-colors"
           >
             {nextYear} →
           </button>
+        )}
+      </div>
+      <div className="flex items-center gap-3 mb-8">
+        <button
+          onClick={() => setCompareOpen(prev => !prev)}
+          className="cursor-pointer text-sm text-muted border border-white/8 px-3 py-1 rounded-sm hover:text-white/70 transition-colors"
+        >
+          Compare with another year
+        </button>
+        {compareOpen && (
+          <div className="flex items-center gap-2">
+            <select
+              value={compareYear}
+              onChange={e => setCompareYear(e.target.value)}
+              className="bg-primary border border-white/8 text-sm text-muted px-2 py-1 rounded-sm"
+            >
+              <option value="">Select year</option>
+              {years
+                .filter(y => y !== yearNum)
+                .map(y => (
+                  <option key={y} value={y}>{y}</option>
+                ))
+              }
+            </select>
+            {compareYear && (
+              <button
+                onClick={() => navigate({ to: '/compare/$year1/$year2', params: { year1: year, year2: compareYear } })}
+                className="cursor-pointer text-sm bg-accent text-white px-3 py-1 rounded-sm hover:bg-accent-hover transition-colors"
+              >
+                Compare →
+              </button>
+            )}
+          </div>
         )}
       </div>
 
