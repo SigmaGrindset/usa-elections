@@ -52,7 +52,7 @@ export const Homepage = () => {
         {[
           { num: '01', title: 'Election Results', desc: 'Browse detailed results for any presidential election from 1789 to 2024. View electoral vote breakdowns by state on an interactive map.' },
           { num: '02', title: 'Side-by-Side Comparison', desc: 'Select any two elections and compare them directly. See how states shifted, which candidates dominated, and how the electoral map changed.' },
-          { num: '03', title: 'Historical Depth', desc: 'From George Washington\'s unanimous victories to modern swing-state battles — every election, every state, every electoral vote.' },
+          { num: '03', title: 'Historical Depth', desc: 'From George Washington\'s unanimous victories to modern swing-state battles - every election, every state, every electoral vote.' },
         ].map((f) => (
           <div key={f.num} className="p-10 bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-colors">
             <div className="font-playfair text-5xl font-bold text-accent/25 mb-4">{f.num}</div>
@@ -139,9 +139,9 @@ export const Homepage = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {[
             { title: 'Electors, not popular vote', text: 'Americans don\'t directly elect the president. Each state appoints electors who cast the official votes. The number of electors per state equals its congressional representation.' },
-            { title: '270 to win', text: 'There are 538 total electoral votes. A candidate must win an absolute majority — at least 270 — to become president. If no candidate reaches 270, the House of Representatives decides.' },
-            { title: 'Winner takes all', text: 'In 48 states, the candidate who wins the popular vote receives all of that state\'s electoral votes. Maine and Nebraska are exceptions — they can split their electors by congressional district.' },
-            { title: 'Why it matters', text: 'The Electoral College means a candidate can win the presidency while losing the national popular vote — as happened in 1824, 1876, 1888, 2000, and 2016.' },
+            { title: '270 to win', text: 'There are 538 total electoral votes. A candidate must win an absolute majority - at least 270 - to become president. If no candidate reaches 270, the House of Representatives decides.' },
+            { title: 'Winner takes all', text: 'In 48 states, the candidate who wins the popular vote receives all of that state\'s electoral votes. Maine and Nebraska are exceptions - they can split their electors by congressional district.' },
+            { title: 'Why it matters', text: 'The Electoral College means a candidate can win the presidency while losing the national popular vote - as happened in 1824, 1876, 1888, 2000, and 2016.' },
           ].map((item) => (
             <div key={item.title} className="pl-5 border-l-2 border-accent/40 bg-accent/[0.03] p-5">
               <div className="text-[0.75rem] font-medium tracking-widest uppercase text-accent mb-2">{item.title}</div>
