@@ -5,7 +5,7 @@ const morgan = require("morgan");
 require("dotenv").config();
 
 const pool = new PrismaPg({ connectionString: process.env.DATABASE_URL! })
-// const prisma = new PrismaClient({ adapter: pool })
+const prisma = new PrismaClient({ adapter: pool })
 
 const app = express()
 
