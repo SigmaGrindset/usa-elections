@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon --exec tsx src/index.ts"
+    "dev": "nodemon --exec tsx src/index.ts",
+    "vercel-build": "prisma generate && tsc"
   },
   "dependencies": {
     "@prisma/adapter-pg": "7.0.0",
