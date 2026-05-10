@@ -104,7 +104,7 @@ export const Compare = () => {
 
       {/* Winners side by side */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-white/4 mb-10">
-        {[{ election: election1, winner: winner1, year: year1 }, { election: election2, winner: winner2, year: year2 }].map(({ election, winner, year }) => (
+        {[{ election: election1, winner: winner1, year: year1 }, { election: election2, winner: winner2, year: year2 }].map(({ winner, year }) => (
           <div key={year} className="bg-primary p-6">
             <div className="text-[0.65rem] tracking-[0.15em] uppercase text-muted mb-4">{year}</div>
             {winner && (

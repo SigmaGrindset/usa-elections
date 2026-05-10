@@ -11,7 +11,7 @@ export const StateDetail = ({ election, stateName }: StateDetailProps) => {
   const stateResult = election.state_results.find(s => s.state_name === stateName)
 
   if (!stateResult) return (
-    <div className="mt-8 p-5 border border-white/6 bg-white/[0.02]">
+    <div className="mt-8 p-5 border border-white/6 bg-white/2">
       <div className="text-sm text-muted">{stateName} did not participate in this election.</div>
     </div>
   )
@@ -23,7 +23,7 @@ export const StateDetail = ({ election, stateName }: StateDetailProps) => {
   const winner = candidates[0]
 
   return (
-    <div className="mt-8 border border-white/6 bg-white/[0.02]">
+    <div className="mt-8 border border-white/6 bg-white/2">
       <div className="p-5 border-b border-white/6 flex items-center justify-between">
         <div>
           <div className="text-[0.65rem] tracking-[0.18em] uppercase text-muted mb-1">Selected State</div>

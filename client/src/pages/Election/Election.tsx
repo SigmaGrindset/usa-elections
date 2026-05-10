@@ -46,17 +46,22 @@ export const Election = () => {
       <div className="flex gap-3 mb-8">
         {prevYear && (
           <button
+            type='button'
             onClick={() => navigate({ to: '/election/$year', params: { year: String(prevYear) } })}
             className="cursor-pointer text-sm text-muted border border-white/8 px-3 py-1 rounded-sm hover:text-white/70 transition-colors"
           >
             ← {prevYear}
           </button>
         )}
-        <button className="text-sm text-white border border-white/25 px-3 py-1 rounded-sm">
+        <button
+          type='button'
+          className="text-sm text-white border border-white/25 px-3 py-1 rounded-sm"
+        >
           {year}
         </button>
         {nextYear && (
           <button
+            type='button'
             onClick={() => navigate({ to: '/election/$year', params: { year: String(nextYear) } })}
             className="cursor-pointer text-sm text-muted border border-white/8 px-3 py-1 rounded-sm hover:text-white/70 transition-colors"
           >
@@ -66,6 +71,7 @@ export const Election = () => {
       </div>
       <div className="flex items-center gap-3 mb-8">
         <button
+          type='button'
           onClick={() => setCompareOpen(prev => !prev)}
           className="cursor-pointer text-sm text-muted border border-white/8 px-3 py-1 rounded-sm hover:text-white/70 transition-colors"
         >
@@ -88,6 +94,7 @@ export const Election = () => {
             </select>
             {compareYear && (
               <button
+                type="button"
                 onClick={() => navigate({ to: '/compare/$year1/$year2', params: { year1: year, year2: compareYear } })}
                 className="cursor-pointer text-sm bg-accent text-white px-3 py-1 rounded-sm hover:bg-accent-hover transition-colors"
               >

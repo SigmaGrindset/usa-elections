@@ -7,7 +7,7 @@ export const Route = createFileRoute('/_app/election/$year')({
   component: Election,
   beforeLoad: ({ params }) => {
     const year = parseInt(params.year)
-    if (isNaN(year) || !years.includes(year)) {
+    if (Number.isNaN(year) || !years.includes(year)) {
       throw notFound()
     }
   }

@@ -38,6 +38,7 @@ export const Homepage = () => {
             View Latest Election →
           </Link>
           <button
+            type='button'
             onClick={() => electionsRef.current?.scrollIntoView({ behavior: 'smooth' })}
             className="cursor-pointer inline-flex items-center gap-2 border border-white/20 text-white text-sm font-medium px-7 py-3 rounded-sm tracking-wide hover:border-white/50 transition-colors"
           >
@@ -54,7 +55,7 @@ export const Homepage = () => {
           { num: '02', title: 'Side-by-Side Comparison', desc: 'Select any two elections and compare them directly. See how states shifted, which candidates dominated, and how the electoral map changed.' },
           { num: '03', title: 'Historical Depth', desc: 'From George Washington\'s unanimous victories to modern swing-state battles - every election, every state, every electoral vote.' },
         ].map((f) => (
-          <div key={f.num} className="p-10 bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-colors">
+          <div key={f.num} className="p-10 bg-white/2 border border-white/5 hover:bg-white/4 transition-colors">
             <div className="font-playfair text-5xl font-bold text-accent/25 mb-4">{f.num}</div>
             <div className="text-sm font-medium mb-3">{f.title}</div>
             <div className="text-sm text-muted leading-relaxed font-light">{f.desc}</div>
@@ -120,6 +121,7 @@ export const Homepage = () => {
             ))}
           </select>
           <button
+            type='button'
             disabled={!compareYear1 || !compareYear2}
             onClick={() => navigate({ to: '/compare/$year1/$year2', params: { year1: compareYear1, year2: compareYear2 } })}
             className="cursor-pointer bg-accent text-white text-sm font-medium px-7 py-3 rounded-sm hover:bg-accent-hover transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
@@ -143,7 +145,7 @@ export const Homepage = () => {
             { title: 'Winner takes all', text: 'In 48 states, the candidate who wins the popular vote receives all of that state\'s electoral votes. Maine and Nebraska are exceptions - they can split their electors by congressional district.' },
             { title: 'Why it matters', text: 'The Electoral College means a candidate can win the presidency while losing the national popular vote - as happened in 1824, 1876, 1888, 2000, and 2016.' },
           ].map((item) => (
-            <div key={item.title} className="pl-5 border-l-2 border-accent/40 bg-accent/[0.03] p-5">
+            <div key={item.title} className="pl-5 border-l-2 border-accent/40 bg-accent/3 p-5">
               <div className="text-[0.75rem] font-medium tracking-widest uppercase text-accent mb-2">{item.title}</div>
               <div className="text-sm text-muted leading-relaxed font-light">{item.text}</div>
             </div>
