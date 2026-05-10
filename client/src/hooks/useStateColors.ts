@@ -1,9 +1,10 @@
 import type { Election } from '#/types'
 import { PARTY_COLORS } from '#/constants'
 
-export const useStateColors = (election: Election) => {
+export const useStateColors = (election: Election | undefined) => {
   const getStateColor = (stateName: string) => {
     const undefinedColor = 'rgba(255,255,255,0.05)'
+    if (!election) return undefinedColor
     const stateResult = election.state_results.find(s => s.state_name === stateName)
     if (!stateResult) return undefinedColor
 

@@ -22,8 +22,9 @@ export const Compare = () => {
   if (isError) return (
     <div className="py-24 text-center text-muted text-sm tracking-widest uppercase">Error loading elections</div>
   )
+  if (!data) return null
 
-  const { election1, election2 } = data!
+  const { election1, election2 } = data
 
   const getWinner = (election: Election) =>
     election.election_candidates.find(c => c.is_winner && c.role === 'president')

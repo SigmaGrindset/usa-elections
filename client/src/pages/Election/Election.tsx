@@ -25,7 +25,7 @@ export const Election = () => {
   const [selectedState, setSelectedState] = useState<string | null>(null)
 
   const election = data?.data
-  const { getStateColor } = useStateColors(election!)
+  const { getStateColor } = useStateColors(election)
   const winner = election?.election_candidates.find(c => c.is_winner && c.role === 'president')
   const presidents = election?.election_candidates.filter(c => c.role === 'president') ?? []
   const totalEv = election?.total_ev ?? 0
