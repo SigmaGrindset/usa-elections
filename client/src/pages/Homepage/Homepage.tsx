@@ -116,7 +116,7 @@ export const Homepage = () => {
             className="cursor-pointer border border-white/10 text-sm px-4 py-3 rounded-sm min-w-[140px]"
           >
             <option value="">Select year</option>
-            {years.filter(y => y !== parseInt(compareYear1)).map(y => (
+            {years.filter(y => y !== parseInt(compareYear1, 10)).map(y => (
               <option key={y} value={y}>{y}</option>
             ))}
           </select>

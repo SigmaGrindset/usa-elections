@@ -11,7 +11,7 @@ import { StateDetail } from './components/StateDetail'
 export const Election = () => {
   const { year } = useParams({ from: '/_app/election/$year' })
   const navigate = useNavigate()
-  const yearNum = parseInt(year)
+  const yearNum = parseInt(year, 10)
   const [compareOpen, setCompareOpen] = useState(false)
   const [compareYear, setCompareYear] = useState<string>('')
 

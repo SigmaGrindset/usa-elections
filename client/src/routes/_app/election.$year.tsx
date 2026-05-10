@@ -6,7 +6,7 @@ import { notFound } from '@tanstack/react-router'
 export const Route = createFileRoute('/_app/election/$year')({
   component: Election,
   beforeLoad: ({ params }) => {
-    const year = parseInt(params.year)
+    const year = parseInt(params.year, 10)
     if (Number.isNaN(year) || !years.includes(year)) {
       throw notFound()
     }
