@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { geoAlbersUsa, geoPath } from 'd3-geo'
 import { select } from 'd3-selection'
 import { feature } from 'topojson-client'
-import type { Topology } from 'topojson-specification'
+import type { Topology, GeometryCollection } from 'topojson-specification'
 import { color as d3Color } from 'd3-color'
 const GEO_URL = "https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json"
 
@@ -35,7 +35,7 @@ export const ElectionMap = ({ getStateColor, onStateClick, selectedState }: Elec
     fetch(GEO_URL)
       .then(res => res.json())
       .then((us: Topology) => {
-        const statesObject = us.objects.states as any
+        const statesObject = us.objects.states as GeometryCollection
         const states = feature(us, statesObject)
         const stateNames = new Map(
           statesObject.geometries.map((d: any) => [d.id, d.properties.name])
