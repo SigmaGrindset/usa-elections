@@ -16,3 +16,9 @@ backend - express
 front - react, tailwind, tanstack router, swr?, shadcn
 
 
+meeting notes
+predaja 12.6.
+obrana 6.7. pa na dalje tjedan (drugi tjedan rokova)
+dijagram aplikacije, deploy, baza, ..... arhitektura
+dijagram slucajeva uporabe
+pregled slicnih stranica - razlike, slicnosti...
