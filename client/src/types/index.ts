@@ -42,3 +42,15 @@ export interface ElectionResponse {
   success: boolean
   data: Election
 }
+
+export interface Stats {
+  democratic: number
+  republican: number
+  other: number
+  total: number
+}
+
+export interface StatsResponse {
+  success: boolean
+  data: Stats
+}

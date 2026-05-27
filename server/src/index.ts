@@ -13,6 +13,9 @@ app.use(cors(process.env.CLIENT_URL))
 const electionRoutes = require("./routes/electionRoutes")
 app.use("/api/election", electionRoutes)
 
+const statsRoutes = require("./routes/statsRoutes")
+app.use("/api/stats", statsRoutes)
+
 app.get("/api/test", (req, res) => {
   return res.json({ res: "Response /api/test" })
 })

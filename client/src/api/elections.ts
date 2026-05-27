@@ -1,5 +1,11 @@
-import type { ElectionResponse } from "#/types"
+import type { ElectionResponse, StatsResponse } from "#/types"
 const API_URL = import.meta.env.VITE_API_URL ?? ''
+
+export const fetchStats = async (): Promise<StatsResponse> => {
+  const response = await fetch(`${API_URL}/api/stats`)
+  if (!response.ok) throw new Error('Failed to fetch stats')
+  return response.json()
+}
 
 export const fetchElection = async (year: number): Promise<ElectionResponse> => {
   const response = await fetch(`${API_URL}/api/election/${year}`)
