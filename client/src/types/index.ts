@@ -54,3 +54,15 @@ export interface StatsResponse {
   success: boolean
   data: Stats
 }
+
+export interface EvTrendPoint {
+  year: number
+  winner_ev: number
+  runner_up_ev: number
+  diff: number
+}
+
+export interface EvTrendResponse {
+  success: boolean
+  data: EvTrendPoint[]
+}

@@ -1,9 +1,15 @@
-import type { ElectionResponse, StatsResponse } from "#/types"
+import type { ElectionResponse, EvTrendResponse, StatsResponse } from "#/types"
 const API_URL = import.meta.env.VITE_API_URL ?? ''
 
 export const fetchStats = async (): Promise<StatsResponse> => {
   const response = await fetch(`${API_URL}/api/stats`)
   if (!response.ok) throw new Error('Failed to fetch stats')
+  return response.json()
+}
+
+export const fetchEvTrend = async (): Promise<EvTrendResponse> => {
+  const response = await fetch(`${API_URL}/api/stats/ev-trend`)
+  if (!response.ok) throw new Error('Failed to fetch EV trend')
   return response.json()
 }
 

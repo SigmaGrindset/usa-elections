@@ -3,7 +3,8 @@ import { useState } from 'react'
 import { years, PARTY_COLORS } from '#/constants'
 import { useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { fetchStats } from '#/api/elections'
+import { fetchEvTrend, fetchStats } from '#/api/elections'
+import { EvTrendChart } from '#/components/ui/EvTrendChart'
 
 const DECADE_GROUPS = [
   { label: '1780s – 1800s', years: years.filter(y => y < 1810) },
@@ -26,6 +27,12 @@ export const Homepage = () => {
     queryFn: fetchStats,
   })
   const stats = statsRes?.data
+
+  const { data: evTrendRes } = useQuery({
+    queryKey: ['ev-trend'],
+    queryFn: fetchEvTrend,
+  })
+  const evTrend = evTrendRes?.data ?? []
 
   return (
     <div className="min-h-screen bg-primary text-text font-dm">
@@ -57,31 +64,49 @@ export const Homepage = () => {
 
       <hr className="border-white/5" />
 
-      {/* Quick stats */}
+      {/* Statistics */}
       <section className="py-16">
         <div className="text-[0.65rem] tracking-[0.18em] uppercase text-muted mb-3">By the Numbers</div>
-        <h2 className="font-playfair text-3xl md:text-4xl font-bold mb-10">Total Presidential Wins</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-white/4">
-          {[
-            { label: 'Democratic', value: stats?.democratic, color: PARTY_COLORS.Democratic },
-            { label: 'Republican', value: stats?.republican, color: PARTY_COLORS.Republican },
-            { label: 'Other parties', value: stats?.other, color: '#8a8780' },
-          ].map(s => (
-            <div key={s.label} className="bg-primary p-6">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: s.color }} />
-                <div className="text-[0.7rem] tracking-widest uppercase text-muted">{s.label}</div>
-              </div>
-              <div className="font-playfair text-5xl font-black" style={{ color: s.color }}>
-                {s.value ?? '—'}
-              </div>
-              {stats && stats.total > 0 && s.value !== undefined && (
-                <div className="text-xs text-muted font-light mt-2">
-                  {((s.value / stats.total) * 100).toFixed(1)}% of {stats.total} elections
+        <h2 className="font-playfair text-3xl md:text-4xl font-bold mb-12">Statistics</h2>
+
+        <div className="mb-14">
+          <h3 className="font-playfair text-xl md:text-2xl font-bold mb-6">Total Presidential Wins</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-white/4">
+            {[
+              { label: 'Democratic', value: stats?.democratic, color: PARTY_COLORS.Democratic },
+              { label: 'Republican', value: stats?.republican, color: PARTY_COLORS.Republican },
+              { label: 'Other parties', value: stats?.other, color: '#8a8780' },
+            ].map(s => (
+              <div key={s.label} className="bg-primary p-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: s.color }} />
+                  <div className="text-[0.7rem] tracking-widest uppercase text-muted">{s.label}</div>
                 </div>
-              )}
-            </div>
-          ))}
+                <div className="font-playfair text-5xl font-black" style={{ color: s.color }}>
+                  {s.value ?? '—'}
+                </div>
+                {stats && stats.total > 0 && s.value !== undefined && (
+                  <div className="text-xs text-muted font-light mt-2">
+                    {((s.value / stats.total) * 100).toFixed(1)}% of {stats.total} elections
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <h3 className="font-playfair text-xl md:text-2xl font-bold mb-2">Electoral Vote Margin Over Time</h3>
+          <p className="text-muted text-sm font-light mb-6 max-w-2xl">
+            Difference in electoral votes between the winner and the runner-up across every presidential election. Hover for details, click a point to view that year's results.
+          </p>
+          <div className="bg-white/2 border border-white/5 p-4 md:p-6">
+            {evTrend.length > 0 ? (
+              <EvTrendChart data={evTrend} />
+            ) : (
+              <div className="text-muted text-sm text-center py-20">Loading trend…</div>
+            )}
+          </div>
         </div>
       </section>
 
