@@ -66,3 +66,24 @@ export interface EvTrendResponse {
   success: boolean
   data: EvTrendPoint[]
 }
+
+export interface ExtremeElection {
+  year: number
+  winner_ev: number
+  winner_name: string
+  winner_party: string
+  runner_up_ev: number
+  runner_up_name: string | null
+  runner_up_party: string | null
+  diff: number
+}
+
+export interface Extremes {
+  largest: ExtremeElection | null
+  smallest: ExtremeElection | null
+}
+
+export interface ExtremesResponse {
+  success: boolean
+  data: Extremes
+}

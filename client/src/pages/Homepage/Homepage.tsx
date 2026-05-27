@@ -3,7 +3,8 @@ import { useState } from 'react'
 import { years, PARTY_COLORS } from '#/constants'
 import { useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { fetchEvTrend, fetchStats } from '#/api/elections'
+import { fetchEvTrend, fetchExtremes, fetchStats } from '#/api/elections'
+import type { ExtremeElection } from '#/types'
 import { EvTrendChart } from '#/components/ui/EvTrendChart'
 
 const DECADE_GROUPS = [
@@ -33,6 +34,12 @@ export const Homepage = () => {
     queryFn: fetchEvTrend,
   })
   const evTrend = evTrendRes?.data ?? []
+
+  const { data: extremesRes } = useQuery({
+    queryKey: ['extremes'],
+    queryFn: fetchExtremes,
+  })
+  const extremes = extremesRes?.data
 
   return (
     <div className="min-h-screen bg-primary text-text font-dm">
@@ -92,6 +99,69 @@ export const Homepage = () => {
                 )}
               </div>
             ))}
+          </div>
+        </div>
+
+        <div className="mb-14">
+          <h3 className="font-playfair text-xl md:text-2xl font-bold mb-2">Extremes</h3>
+          <p className="text-muted text-sm font-light mb-6 max-w-2xl">
+            The most decisive landslide and the narrowest electoral-vote victory in U.S. presidential history.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-white/4">
+            {[
+              { label: 'Largest Margin', kind: 'largest' as const, ex: extremes?.largest },
+              { label: 'Smallest Margin', kind: 'smallest' as const, ex: extremes?.smallest },
+            ].map(({ label, kind, ex }) => {
+              const renderExtreme = (e: ExtremeElection) => {
+                const winnerColor = PARTY_COLORS[e.winner_party as keyof typeof PARTY_COLORS] ?? '#8a8780'
+                const runnerColor = e.runner_up_party
+                  ? PARTY_COLORS[e.runner_up_party as keyof typeof PARTY_COLORS] ?? '#8a8780'
+                  : '#8a8780'
+                return (
+                  <>
+                    <div className="flex items-baseline justify-between mb-4">
+                      <Link
+                        to="/election/$year"
+                        params={{ year: String(e.year) }}
+                        className="font-playfair text-4xl md:text-5xl font-black text-white hover:text-accent transition-colors"
+                      >
+                        {e.year}
+                      </Link>
+                      <div className="text-right">
+                        <div className="font-playfair text-3xl md:text-4xl font-black" style={{ color: kind === 'largest' ? '#10b981' : '#f59e0b' }}>
+                          {e.diff}
+                        </div>
+                        <div className="text-[0.65rem] tracking-widest uppercase text-muted">EV margin</div>
+                      </div>
+                    </div>
+                    <div className="space-y-2 text-sm font-light">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full shrink-0" style={{ background: winnerColor }} />
+                        <span className="text-muted">Winner:</span>
+                        <span className="text-white">{e.winner_name}</span>
+                        <span className="text-muted/70 text-xs">({e.winner_party})</span>
+                        <span className="ml-auto text-white font-medium">{e.winner_ev} EV</span>
+                      </div>
+                      {e.runner_up_name && (
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full shrink-0" style={{ background: runnerColor }} />
+                          <span className="text-muted">Runner-up:</span>
+                          <span className="text-white">{e.runner_up_name}</span>
+                          <span className="text-muted/70 text-xs">({e.runner_up_party})</span>
+                          <span className="ml-auto text-white font-medium">{e.runner_up_ev} EV</span>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )
+              }
+              return (
+                <div key={label} className="bg-primary p-6">
+                  <div className="text-[0.7rem] tracking-widest uppercase text-muted mb-4">{label}</div>
+                  {ex ? renderExtreme(ex) : <div className="text-muted text-sm">Loading…</div>}
+                </div>
+              )
+            })}
           </div>
         </div>
 
